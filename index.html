@@ -6,22 +6,46 @@
 <body>
   <input id="connect_button" type="button" value="Connect" onclick="connectWallet()" style="display: none"></input>
   <p id="account_address" style="display: none"></p>
-  <p id="web3_message"></p>
-  <p id="contract_state"></p>
-  <input type="input"  value="get()" id="_code"></input>
-  <input type="button" value="Compile" onclick="_compile()"></input>
-  <input type="text"  value="" id="_bytecode"></input>
-  <input type="text"  value="" id="_abi"></input>
+  <p id="web3_message" style="display: none"></p>
+  <p id="contract_state" style="display: none"></p>
+  <h2>📝</h2>
+  <textarea value="" rows="10" cols="80" id="_code">👻2️⃣
+📌4️⃣
+🗝8️⃣</textarea></br>
+  <input type="button" value="🛠" onclick="_compile()"></input></br>
+  <h2>🔢</h2>
+  <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_bytecode"></textarea></br>
+  <h2>📑</h2>
+  <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_abi"></textarea></br>
   <br>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.5/web3.min.js"></script>
+  <script type="text/javascript" src="emojiLib.js"></script>
+  <script type="text/javascript" src="evmLib.js"></script>
   <script type="text/javascript" src="blockchain_stuff.js"></script>
+  <script defer src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
 </body>
 </html>
 
 <script>
+
+
+function convertToEmoji(unicodeCodePoints) {
+  return unicodeCodePoints.map(codePoint => String.fromCodePoint(...codePoint.split('-').map(hex => parseInt(hex, 16))));
+}
+
   function _compile()
   {
-    _code = document.getElementById("_code").value
-    compile(_code)
+    var container = document.getElementById("_code").value;
+    var unicodeCodePoints = [];
+
+    if (container) {
+      // Parse the container using twemoji
+      twemoji.parse(container, function(icon, options, variant) {
+        unicodeCodePoints.push(icon);
+      });
+    }
+    var emojis = convertToEmoji(unicodeCodePoints);
+
+    compile(emojis, unicodeCodePoints)
   }
 </script>
