@@ -312,42 +312,85 @@ function rReturn(offset, size) {
   return returnValue
 }
 
-const compile = async (_code) => {
-  functionSelector = getSelector(_code)
+function contractHeader(contractSize) {
+  returnValue = ""
+    + codeCopy("00", "0d", contractSize)
+    + rReturn("00", contractSize)
+    + OPCODE_INVALID
+  return returnValue
+}
 
-  begin = ""
-  + codeCopy("00", "0d", "55")
-  + rReturn("00", "55")
-  + OPCODE_INVALID
-  + push("00")
-  + OPCODE_CALLVALUE
-  + OPCODE_GT
-  + OPCODE_ISZERO  
-  + push("0c")
-  + OPCODE_JUMPI
-  + push("00")
-  + OPCODE_DUP1
-  + OPCODE_REVERT
-  + OPCODE_JUMPDEST
-  + push("12")
-  + push("2c")
-  + OPCODE_JUMP
-  + OPCODE_JUMPDEST
+function intToHex(num) {
+  return (num/2).toString(16).padStart(2, '0').toUpperCase()
+}
 
-  end =
+function modifyChar(originalString, index, newChar) {
+  if (index < 0 || index >= originalString.length) {
+      // Index out of bounds
+      return originalString;
+  }
+
+  // Create a new string with the modified character
+  return (
+      originalString.substr(0, index) + newChar + originalString.substr(index + 1)
+  );
+}
+
+var jumpCounter = 0
+
+
+function selectorLookup(signature, destination) {
+  returnValue =  push(getSelector(signature))
   + OPCODE_DUP2
   + OPCODE_EQ
-  + push("21")
+  + push(destination)
   + OPCODE_JUMPI
-  + push("00")
-  + OPCODE_DUP1
-  + OPCODE_REVERT
-  + OPCODE_JUMPDEST
-  + push("0c")
+
+  return returnValue
+}
+
+function functionLogic(jumpLocation, returnValue)
+{
+  returnValue = jumpLocation
+  + push(returnValue)
   + push("00")
   + OPCODE_MSTORE
   + rReturn("00", "20")
-  + OPCODE_JUMPDEST
+
+  return returnValue
+}
+
+const compile = async (_code) => {
+  functionSelector = getSelector(_code)
+
+  functions = []
+  functions.push({name: "uno()", returnValue: "01"})
+  functions.push({name: "dos()", returnValue: "02"})
+  functions.push({name: "tres()", returnValue: "03"})
+
+  console.log(functions)
+
+  selectorLookups = ""
+  for(i=0; i<functions.length; i++)
+  {
+    console.log(functions[i].name)
+  }
+
+  contractBody = ""
+  + push("j1")
+  + push("j0")
+  + OPCODE_JUMP
+  + "d1"
+  + selectorLookup("uno()", "j2")
+  + selectorLookup("dos()", "j3")
+  + selectorLookup("tres()", "j4")
+  + push("00")
+  + OPCODE_DUP1
+  + OPCODE_REVERT
+  + functionLogic("d2", "01")
+  + functionLogic("d3", "02")
+  + functionLogic("d4", "03")
+  + "d0"
   + push("00")
   + push("0100000000000000000000000000000000000000000000000000000000")
   + push("00")
@@ -357,7 +400,37 @@ const compile = async (_code) => {
   + OPCODE_POP
   + OPCODE_SWAP1
   + OPCODE_JUMP
+  
+  //contractBody = begin + push(functionSelector) + end
+  contractBodySize = intToHex(contractBody.length)
 
-  document.getElementById("_bytecode").value = begin + push(functionSelector) + end
+  // Setup Jump Destinations
+  for(var i=0; i<contractBody.length; i+=2)
+  {
+    if(contractBody[i]=='j')
+    {
+      for(var j=0; j<contractBody.length; j+=2)
+      {
+        if(contractBody[j]=='d' && contractBody[j+1]==contractBody[i+1])
+        {
+          destinationPosition = intToHex(j)
+          contractBody = modifyChar(contractBody, i, destinationPosition[0])
+          contractBody = modifyChar(contractBody, i+1, destinationPosition[1])
+        }
+      }
+    }
+  }
+
+  // Setup OPCODE_JUMPDEST
+  for(var i=0; i<contractBody.length; i+=2)
+  {
+    if(contractBody[i]=='d')
+    {
+      contractBody = modifyChar(contractBody, i, '5')
+      contractBody = modifyChar(contractBody, i+1, 'B')
+    }
+  }  
+
+  document.getElementById("_bytecode").value = contractHeader(contractBodySize) + contractBody
   document.getElementById("_abi").value = 123
 }
