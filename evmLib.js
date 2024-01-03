@@ -160,6 +160,11 @@ function getSelector(functionName) {
       return OPCODE_PUSH4 + value
     if(value.length == 58)
       return OPCODE_PUSH29 + value
+    if(value.length == 64)
+      return OPCODE_PUSH32 + value
+    
+    console.log("ERROR VALUE: " + value)
+    return "PUSHERROR"
   }
   
   function codeCopy(destOffest, offest, size) {
@@ -178,15 +183,30 @@ function getSelector(functionName) {
   }
   
   function contractHeader(contractSize) {
+    offset = intToHex((10 + (contractSize.length*3)/2))
+    while(contractSize.length > offset.length)
+    {
+      offset = "00" + offset
+    }
+
+    console.log(offset)
+    console.log(contractSize)
     returnValue = ""
-      + codeCopy("00", "0d", contractSize)
+      + codeCopy("00", offset, contractSize)
       + rReturn("00", contractSize)
       + OPCODE_INVALID
     return returnValue
   }
   
   function intToHex(num) {
-    return (num/2).toString(16).padStart(2, '0').toUpperCase()
+
+    returnValue = (num).toString(16).toUpperCase()
+
+    if(returnValue.length%2 != 0)
+    {
+      returnValue = "0" + returnValue
+    }
+    return returnValue
   }
   
   function modifyChar(originalString, index, newChar) {
@@ -212,6 +232,24 @@ function getSelector(functionName) {
   }
   
   function functionLogic(jumpLocation, returnValue)
+  {
+    returnValue = jumpLocation
+    + push("20")
+    + push("00")
+    + OPCODE_MSTORE
+    + push("0E")
+    + push("20")
+    + OPCODE_MSTORE
+    //+ push("737461636B6F766572666C6F7721000000000000000000000000000000000000")
+    ////+ push("0100000000000000000000000000000000000000000000000000000000")
+    //+ push("40")
+    //+ OPCODE_MSTORE
+    + rReturn("00", "60")
+
+    return returnValue
+  }
+
+  function functionIntLogic(jumpLocation, returnValue)
   {
     returnValue = jumpLocation
     + push(returnValue)

@@ -195,7 +195,16 @@ const compile = async (unicodeCodePoints) => {
     functionLogics = ""
     for(i=0; i<functions.length; i++)
     {
-      functionLogics += functionLogic("d"+ String.fromCharCode(i), "61")
+        if(functions[i].returnType == "uint256")
+        {
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(i), "61")
+        }else if(functions[i].returnType == "string")
+        {
+            functionLogics += functionLogic("d"+ String.fromCharCode(i), "61")
+        }else
+        {
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(i), "61")
+        }
     }
   
     contractBody = ""
@@ -220,7 +229,7 @@ const compile = async (unicodeCodePoints) => {
     + OPCODE_JUMP
     
     //contractBody = begin + push(functionSelector) + end
-    contractBodySize = intToHex(contractBody.length)
+    contractBodySize = intToHex(contractBody.length/2)
   
     // Setup Jump Destinations
     for(var i=0; i<contractBody.length; i+=2)
@@ -231,7 +240,7 @@ const compile = async (unicodeCodePoints) => {
         {
           if(contractBody[j]=='d' && contractBody[j+1]==contractBody[i+1])
           {
-            destinationPosition = intToHex(j)
+            destinationPosition = intToHex(j/2)
             contractBody = modifyChar(contractBody, i, destinationPosition[0])
             contractBody = modifyChar(contractBody, i+1, destinationPosition[1])
           }
@@ -263,6 +272,8 @@ const compile = async (unicodeCodePoints) => {
     }
     abi += "]"
   
+    console.log("Size:" + contractBodySize)
+
     document.getElementById("_bytecode").value = contractHeader(contractBodySize) + contractBody
     document.getElementById("_abi").value = abi
   }
