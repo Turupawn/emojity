@@ -2,6 +2,30 @@ var currentToken
 var tokens
 var functions
 
+function functionNameConversor(functionName)
+{
+    if(functionName == "coinMoneyBag")
+        return "totalSupply"
+    if(functionName == "coinMoneyMouthFace")
+        return "balanceOf"
+    if(functionName == "coinMoneyWithWings")
+        return "transfer"
+    if(functionName == "coinPassportControl")
+        return "allowance"
+    if(functionName == "coinWhiteHeavyCheckMark")
+        return "approve"
+    if(functionName == "coinAtmSign")
+        return "transferFrom"
+    if(functionName == "coinNameBadge")
+        return "name"
+    if(functionName == "coinIDButton")
+        return "symbol"
+    if(functionName == "coinPie")
+        return "decimals"
+
+    return functionName
+}
+
 function parseNumber()
 {
     if(currentToken >= tokens.length)
@@ -157,7 +181,7 @@ function parseFunction()
         console.log("Error: invalid return type")
         return;
     }
-    functions.push({name: functionName, parameters: parameters, returnType: returnType, visibility: visibility})
+    functions.push({name: functionNameConversor(functionName), parameters: parameters, returnType: returnType, visibility: visibility})
 
     currentToken+=1
     parseFunction()
@@ -197,13 +221,13 @@ const compile = async (unicodeCodePoints) => {
     {
         if(functions[i].returnType == "uint256")
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(i), "61")
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(i), "12")
         }else if(functions[i].returnType == "string")
         {
             functionLogics += functionLogic("d"+ String.fromCharCode(i), "61")
         }else
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(i), "61")
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(i), "12")
         }
     }
   

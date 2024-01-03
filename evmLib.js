@@ -234,17 +234,20 @@ function getSelector(functionName) {
   function functionLogic(jumpLocation, returnValue)
   {
     returnValue = jumpLocation
-    + push("20")
+    + push("20")//start?
     + push("00")
     + OPCODE_MSTORE
-    + push("0E")
+    + push("03")// length
     + push("20")
     + OPCODE_MSTORE
-    //+ push("737461636B6F766572666C6F7721000000000000000000000000000000000000")
-    ////+ push("0100000000000000000000000000000000000000000000000000000000")
-    //+ push("40")
-    //+ OPCODE_MSTORE
+    + push("7374000000000000000000000000000000000000000000000000000000000000")
+    + push("40")
+    + OPCODE_MSTORE
     + rReturn("00", "60")
+
+    //14
+    //stackoverflow!
+    //737461636B6F766572666C6F7721000000000000000000000000000000000000
 
     return returnValue
   }
