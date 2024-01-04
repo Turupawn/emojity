@@ -213,7 +213,7 @@ const compile = async (unicodeCodePoints) => {
     for(i=0; i<functions.length; i++)
     {
         functionSignature = getFunctionSignature(functions[i].name, functions[i].parameters)
-        selectorLookups += selectorLookup(functionSignature, "j"+ String.fromCharCode(i))
+        selectorLookups += selectorLookup(functionSignature, "j"+ String.fromCharCode(97+i))
     }
   
     functionLogics = ""
@@ -221,19 +221,19 @@ const compile = async (unicodeCodePoints) => {
     {
         if(functions[i].returnType == "uint256")
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(i), "12")
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12")
         }else if(functions[i].returnType == "string")
         {
-            functionLogics += functionLogic("d"+ String.fromCharCode(i), "61")
+            functionLogics += functionLogic("d"+ String.fromCharCode(97+i), "61")
         }else
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(i), "12")
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12")
         }
     }
   
     contractBody = ""
-    + push("j1")
-    + push("j0")
+    + push("j100")
+    + push("j000")
     + OPCODE_JUMP
     + "d1"
     + selectorLookups
@@ -251,7 +251,7 @@ const compile = async (unicodeCodePoints) => {
     + OPCODE_POP
     + OPCODE_SWAP1
     + OPCODE_JUMP
-    
+
     //contractBody = begin + push(functionSelector) + end
     contractBodySize = intToHex(contractBody.length/2)
   
@@ -265,8 +265,13 @@ const compile = async (unicodeCodePoints) => {
           if(contractBody[j]=='d' && contractBody[j+1]==contractBody[i+1])
           {
             destinationPosition = intToHex(j/2)
+            if(destinationPosition.length==2)
+                destinationPosition = "00"+destinationPosition
             contractBody = modifyChar(contractBody, i, destinationPosition[0])
             contractBody = modifyChar(contractBody, i+1, destinationPosition[1])
+            contractBody = modifyChar(contractBody, i+2, destinationPosition[2])
+            contractBody = modifyChar(contractBody, i+3, destinationPosition[3])
+            break // TODO remove this allow many jumps to one destination
           }
         }
       }
@@ -296,8 +301,6 @@ const compile = async (unicodeCodePoints) => {
     }
     abi += "]"
   
-    console.log("Size:" + contractBodySize)
-
     document.getElementById("_bytecode").value = contractHeader(contractBodySize) + contractBody
     document.getElementById("_abi").value = abi
   }

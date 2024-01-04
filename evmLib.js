@@ -189,8 +189,6 @@ function getSelector(functionName) {
       offset = "00" + offset
     }
 
-    console.log(offset)
-    console.log(contractSize)
     returnValue = ""
       + codeCopy("00", offset, contractSize)
       + rReturn("00", contractSize)
@@ -222,6 +220,8 @@ function getSelector(functionName) {
   }
   
   function selectorLookup(signature, destination) {
+    if(destination.length==2)
+      destination = destination+"00"
     returnValue =  push(getSelector(signature).toUpperCase())
     + OPCODE_DUP2
     + OPCODE_EQ
