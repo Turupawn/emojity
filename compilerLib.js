@@ -32,54 +32,53 @@ function parseNumber()
         return "";
     
     returnValue = ""
-
-    switch (toEmoji(tokens[currentToken])) {
-        case '0️⃣':
-        returnValue = "0"
-        break;
-        case '1️⃣':
-        returnValue = "1"
-        break;
-        case '2️⃣':
-        returnValue = "2"
-        break;
-        case '3️⃣':
-        returnValue = "3"
-        break;
-        case '4️⃣':
-        returnValue = "4"
-        break;
-        case '5️⃣':
-        returnValue = "5"
-        break;
-        case '6️⃣':
-        returnValue = "6"
-        break;
-        case '7️⃣':
-        returnValue = "7"
-        break;
-        case '8️⃣':
-        returnValue = "8"
-        break;
-        case '9️⃣':
-        returnValue = "9"
-        break;
-        case '🔟':
-        returnValue = "10"
-        break;
-    }
-
-    if(returnValue != "")
-    {
+    do {
+        switch (toEmoji(tokens[currentToken])) {
+            case '0️⃣':
+            returnValue += "0"
+            break;
+            case '1️⃣':
+            returnValue += "1"
+            break;
+            case '2️⃣':
+            returnValue += "2"
+            break;
+            case '3️⃣':
+            returnValue += "3"
+            break;
+            case '4️⃣':
+            returnValue += "4"
+            break;
+            case '5️⃣':
+            returnValue += "5"
+            break;
+            case '6️⃣':
+            returnValue += "6"
+            break;
+            case '7️⃣':
+            returnValue += "7"
+            break;
+            case '8️⃣':
+            returnValue += "8"
+            break;
+            case '9️⃣':
+            returnValue += "9"
+            break;
+            case '🔟':
+            returnValue += "10"
+            break;
+            default:
+            return returnValue
+        }
         currentToken+=1
-        return returnValue + parseNumber()
-    }
+    } while(currentToken <= tokens.length)
+    return returnValue
 }
 
 function parseUint()
 {
-    currentToken+=1
     numberBytes = parseNumber()
+    currentToken-=1
     if(numberBytes == "8")
     {
         return "uint8"
@@ -98,9 +97,6 @@ function parseUint()
     }else if(numberBytes == "256")
     {
         return "uint256"
-    }else
-    {
-        currentToken-=1
     }
     return "uint256"
 }
@@ -122,6 +118,7 @@ function parseParameter()
             parameter = "bool"
         break;
         case '🔢':
+            currentToken+=1
             parameter = parseUint()
         break;
         default:
@@ -131,7 +128,7 @@ function parseParameter()
 
     currentToken+=1
     returnValue = parseParameter()
-    returnValue.push(parameter)
+    returnValue.unshift(parameter)
     return returnValue
 }
 
@@ -175,15 +172,41 @@ function parseFunction()
             returnType = "bool"
         break;
         case '🔢':
+            currentToken+=1
             returnType = parseUint()
         break;
         default:
         console.log("Error: invalid return type")
         return;
     }
-    functions.push({name: functionNameConversor(functionName), parameters: parameters, returnType: returnType, visibility: visibility})
 
     currentToken+=1
+
+    if(toEmoji(tokens[currentToken]) != '🏁')
+    {
+        console.log("Error: 🏁 expected, " + toEmoji(tokens[currentToken]) + ' found')
+    }
+
+    var instructions = []
+    while(currentToken < tokens.length
+            && toEmoji(tokens[currentToken]) != '🔚')
+    {
+        if(toEmoji(tokens[currentToken]) == '↩️')
+        {
+            currentToken+=1
+            returnValue = parseNumber()
+            instructions.push({instruction: "returnUint", value: returnValue})
+            break
+        }else
+        {
+            currentToken+=1
+        }
+    }
+
+    currentToken+=1
+
+    functions.push({name: functionNameConversor(functionName), parameters: parameters, returnType: returnType, visibility: visibility, instructions: instructions})
+
     parseFunction()
 }
 
@@ -221,13 +244,13 @@ const compile = async (unicodeCodePoints) => {
     {
         if(functions[i].returnType == "uint256")
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12")
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12", functions[i].instructions)
         }else if(functions[i].returnType == "string")
         {
             functionLogics += functionLogic("d"+ String.fromCharCode(97+i), "61")
         }else
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12")
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12", functions[i].instructions)
         }
     }
   

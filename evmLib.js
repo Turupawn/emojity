@@ -158,8 +158,66 @@ function getSelector(functionName) {
       return OPCODE_PUSH3 + value
     if(value.length == 8)
       return OPCODE_PUSH4 + value
+    if(value.length == 10)
+      return OPCODE_PUSH5 + value
+
+    if(value.length == 12)
+      return OPCODE_PUSH6 + value
+    if(value.length == 14)
+      return OPCODE_PUSH7 + value
+    if(value.length == 16)
+      return OPCODE_PUSH8 + value
+    if(value.length == 18)
+      return OPCODE_PUSH9 + value
+    if(value.length == 20)
+      return OPCODE_PUSH10 + value
+
+    if(value.length == 22)
+      return OPCODE_PUSH11 + value
+    if(value.length == 24)
+      return OPCODE_PUSH12 + value
+    if(value.length == 26)
+      return OPCODE_PUSH13 + value
+    if(value.length == 28)
+      return OPCODE_PUSH14 + value
+    if(value.length == 30)
+      return OPCODE_PUSH15 + value
+
+    if(value.length == 32)
+      return OPCODE_PUSH16 + value
+    if(value.length == 34)
+      return OPCODE_PUSH17 + value
+    if(value.length == 36)
+      return OPCODE_PUSH18 + value
+    if(value.length == 38)
+      return OPCODE_PUSH19 + value
+    if(value.length == 40)
+      return OPCODE_PUSH20 + value
+
+    if(value.length == 42)
+      return OPCODE_PUSH21 + value
+    if(value.length == 44)
+      return OPCODE_PUSH22 + value
+    if(value.length == 46)
+      return OPCODE_PUSH23 + value
+    if(value.length == 48)
+      return OPCODE_PUSH24 + value
+    if(value.length == 50)
+      return OPCODE_PUSH25 + value
+
+    if(value.length == 52)
+      return OPCODE_PUSH26 + value
+    if(value.length == 54)
+      return OPCODE_PUSH27 + value
+    if(value.length == 56)
+      return OPCODE_PUSH28 + value
     if(value.length == 58)
       return OPCODE_PUSH29 + value
+    if(value.length == 60)
+      return OPCODE_PUSH30 + value
+
+    if(value.length == 62)
+      return OPCODE_PUSH31 + value
     if(value.length == 64)
       return OPCODE_PUSH32 + value
     
@@ -237,13 +295,16 @@ function getSelector(functionName) {
     + push("20")//start?
     + push("00")
     + OPCODE_MSTORE
-    + push("03")// length
+    + push("05")// length
     + push("20")
     + OPCODE_MSTORE
-    + push("7374000000000000000000000000000000000000000000000000000000000000")
+    + push("454D4F4A49000000000000000000000000000000000000000000000000000000")
     + push("40")
     + OPCODE_MSTORE
     + rReturn("00", "60")
+
+
+    //45 4D 4F 4A 49
 
     //14
     //stackoverflow!
@@ -252,13 +313,54 @@ function getSelector(functionName) {
     return returnValue
   }
 
-  function functionIntLogic(jumpLocation, returnValue)
+  function functionIntLogic(jumpLocation, returnValue, instructions)
   {
-    returnValue = jumpLocation
-    + push(returnValue)
-    + push("00")
-    + OPCODE_MSTORE
-    + rReturn("00", "20")
-  
+    hexReturnValue = intToHex(parseInt(instructions[0].value))
+    console.log("Value: " + instructions[0].value)
+    console.log("HEX: " + hexReturnValue)
+    if(instructions[0].value == "1000000000000000000")
+    {
+      console.log("!!")
+      returnValue = jumpLocation
+      + push("04")
+      + OPCODE_CALLDATALOAD
+      + push("01000000000000000000000000")
+      + OPCODE_MUL
+      + push("00")
+      + OPCODE_MSTORE
+      + push("14")
+      + push("00")
+      + OPCODE_KECCAK256
+      + OPCODE_SLOAD
+      + push("00")
+      + OPCODE_MSTORE
+      + rReturn("00", "20")
+    }else if(instructions[0].value == "8000000000000000000")
+    {
+      returnValue = jumpLocation
+      + push("05000000000000000000")
+      + push("04")
+      + OPCODE_CALLDATALOAD
+      + push("01000000000000000000000000")
+      + OPCODE_MUL
+      + push("00")
+      + OPCODE_MSTORE
+      + push("14")
+      + push("00")
+      + OPCODE_KECCAK256
+      + OPCODE_SSTORE
+      + push(hexReturnValue)
+      + push("00")
+      + OPCODE_MSTORE
+      + rReturn("00", "20")
+    }else
+    {
+      returnValue = jumpLocation
+      + push(hexReturnValue)
+      + push("00")
+      + OPCODE_MSTORE
+      + rReturn("00", "20")
+    }
+
     return returnValue
   }
