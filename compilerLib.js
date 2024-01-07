@@ -247,7 +247,7 @@ const compile = async (unicodeCodePoints) => {
             functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12", functions[i].instructions)
         }else if(functions[i].returnType == "string")
         {
-            functionLogics += functionLogic("d"+ String.fromCharCode(97+i), "61")
+            functionLogics += functionLogic("d"+ String.fromCharCode(97+i), "61", functions[i].instructions)
         }else
         {
             functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12", functions[i].instructions)
