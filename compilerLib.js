@@ -127,8 +127,13 @@ function parseParameter()
     }
 
     currentToken+=1
+
+    identifier = toEmoji(tokens[currentToken])
+
+    currentToken+=1
+
     returnValue = parseParameter()
-    returnValue.unshift(parameter)
+    returnValue.unshift({type: parameter, identifier: identifier})
     return returnValue
 }
 
@@ -137,9 +142,9 @@ function parseFunction()
     if(currentToken >= tokens.length)
         return;
     
-    functionName = getEmojiDescription(toEmoji(tokens[currentToken]), emojiMap)
+    functionName = getEmojiDescription(toEmoji(tokens[currentToken]))
     currentToken+=1
-    functionName += getEmojiDescription(toEmoji(tokens[currentToken]), emojiMap)
+    functionName += getEmojiDescription(toEmoji(tokens[currentToken]))
     functionName = convertToFunctionName(functionName)
     currentToken+=1
 
@@ -219,7 +224,7 @@ function getFunctionSignature(name, parameters)
         {
             returnValue+=","
         }
-        returnValue+=parameters[i]
+        returnValue+=parameters[i].type
     }
     returnValue += ")"
     return returnValue

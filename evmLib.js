@@ -166,7 +166,6 @@ function getSelector(functionName) {
       + keccak256("00", "14") // Get my balance key
       + OPCODE_SSTORE // Store my new balance
 
-
       + push("04") // Put address on memory
       + OPCODE_CALLDATALOAD
       + push("01000000000000000000000000")
