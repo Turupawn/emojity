@@ -89,9 +89,121 @@ function rReturn(offset, size) {
   return returnValue
 }
 
+function returnLiteral(value, size) {
+  let returnValue = push(value) // Return true
+        + storeTopOfStackInMemory("00")
+        + rReturn("00", size)
+  return returnValue
+}
+
+function returnLabel(label, size) {
+  let returnValue = putValueOnStack(label) // Return true
+        + storeTopOfStackInMemory("00")
+        + rReturn("00", size)
+  return returnValue
+}
+
 function keccak256(offset, size) {
   returnValue = push(size)
     + push(offset)
     + OPCODE_KECCAK256
+  return returnValue
+}
+
+function putLabelOnStack(label) {
+  if(label == '👤') {
+    let senderOnTopOfStack = putSenderOnStack()
+    return senderOnTopOfStack
+  }
+  let calldataLocation = labelMap.get(label).calldataLocation
+  let size = labelMap.get(label).size
+
+  let returnValue = push(calldataLocation) // Put address on memory
+    + OPCODE_CALLDATALOAD
+  if(size != 32)
+  {
+    let sizeAdjustement = "01"
+    for (let i = 0; i < 32-size; i++) {
+      sizeAdjustement += "00";
+    }
+    returnValue += push(sizeAdjustement)
+      + OPCODE_MUL
+  }
+
+  return returnValue
+}
+
+function putSenderOnStack() {
+  
+  let returnValue =  OPCODE_CALLER // Get my address
+  + push("01000000000000000000000000")
+  + OPCODE_MUL
+
+  return returnValue
+}
+
+function putMappingValueOnStack(keyLabel, keySize) {
+  let returnValue = putLabelOnStack(keyLabel)
+    + storeTopOfStackInMemory("00")
+    + keccak256("00", keySize) // Get my balance key
+    + OPCODE_SLOAD // Get my balance
+
+  return returnValue
+}
+
+function putMappingValueOnState(keyLabel, keySize) {
+  let returnValue = putLabelOnStack(keyLabel)
+    + storeTopOfStackInMemory("00")
+    + keccak256("00", keySize) // Get my balance key
+    + OPCODE_SSTORE // Get my balance
+  return returnValue
+}
+
+function putValueOnStack(label) {
+
+  if(label.length == 1)
+  {
+    return putLabelOnStack(label[0])
+  }else if(label.length == 2)
+  {
+    return putMappingValueOnStack(label[1], intToHex(20))
+  }else{
+    console.log("Error: Invalid label length while trying to put it on stack")
+  }
+}
+
+function putValueOnState(label) {
+
+  if(label.length == 1)
+  {
+    //return putLabelOnState(label[0])
+    // TODO: IMPLEMENT THIS
+  }else if(label.length == 2)
+  {
+    return putMappingValueOnState(label[1], intToHex(20))
+  }else{
+    console.log("Error: Invalid label length while triying to put it on state")
+  }
+}
+
+function storeTopOfStackInMemory(offset) {
+  let returnValue = push(offset)
+    + OPCODE_MSTORE
+  return returnValue
+}
+
+function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Operator] rrValue
+{
+  let returnValue = ""
+  returnValue += putValueOnStack(rrValue)
+  returnValue += putValueOnStack(rlValue)
+  if(operator == '➕')
+  {
+    returnValue += OPCODE_ADD
+  }else if(operator == '➖')
+  {
+    returnValue += OPCODE_SUB
+  }
+  returnValue += putValueOnState(lValue)
   return returnValue
 }

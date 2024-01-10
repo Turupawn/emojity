@@ -1,3 +1,5 @@
+var labelMap = new Map()
+
 var web3
 const getWeb3 = async () => {
   return new Promise((resolve, reject) => {
@@ -103,11 +105,15 @@ function getSelector(functionName) {
     return returnValue
   }
   
-  function functionLogic(jumpLocation, returnValue, instructions)
+  function functionLogic(jumpLocation, functionData)
   {
+    let functionName = functionData.name
+    let parameters = functionData.parameters
+    let instructions = functionData.instructions
+
     let literalValue = intToHex(parseInt(instructions[0].value))
     let literalInstructionLength = intToHex(literalValue.length/2)
-    console.log(instructions[0].value)
+
     while(literalValue.length < 64)
     {
       literalValue+="0"
@@ -127,60 +133,53 @@ function getSelector(functionName) {
     return returnValue
   }
 
-  function functionIntLogic(jumpLocation, returnValue, instructions) // getBalance
+  function functionIntLogic(jumpLocation, functionData)
   {
-    hexReturnValue = intToHex(parseInt(instructions[0].value))
-    if(instructions[0].value == "1000000000000000000")
-    {
-      returnValue = jumpLocation
-      + push("04")
-      + OPCODE_CALLDATALOAD
-      + push("01000000000000000000000000")
-      + OPCODE_MUL
-      + push("00")
-      + OPCODE_MSTORE
-      + keccak256("00", "14")
-      + OPCODE_SLOAD
-      + push("00")
-      + OPCODE_MSTORE
-      + rReturn("00", "20")
-    }else if(instructions[0].value == "8") // transfer
-    {
-      returnValue = jumpLocation
-      + push("24") // Put amount param on the stack 2 times (one for - and one for +)
-      + OPCODE_CALLDATALOAD
-      + OPCODE_DUP1
-      + OPCODE_CALLER // Get my address
-      + push("01000000000000000000000000")
-      + OPCODE_MUL
-      + push("00")
-      + OPCODE_MSTORE
-      + keccak256("00", "14") // Get my balance key
-      + OPCODE_SLOAD // Get my balance
-      + OPCODE_SUB
-      + OPCODE_CALLER // TODO: Use duplicate
-      + push("01000000000000000000000000")
-      + OPCODE_MUL
-      + push("00")
-      + OPCODE_MSTORE
-      + keccak256("00", "14") // Get my balance key
-      + OPCODE_SSTORE // Store my new balance
+    let functionName = functionData.name
+    let parameters = functionData.parameters
+    let instructions = functionData.instructions
 
-      + push("04") // Put address on memory
-      + OPCODE_CALLDATALOAD
-      + push("01000000000000000000000000")
-      + OPCODE_MUL
-      + push("00")
-      + OPCODE_MSTORE
-      + keccak256("00", "14") // Get key position
-      + OPCODE_DUP1
-      + OPCODE_SLOAD // Get my balance
-      + OPCODE_ADD
-      + OPCODE_SSTORE
-      + push("01") // Return true
-      + push("00")
-      + OPCODE_MSTORE
-      + rReturn("00", "20")
+    labelMap = new Map()
+    for(i=0; i<parameters.length; i++)
+    {
+      let paramSize = 0
+      if(parameters[i].type == "address")
+      {
+        paramSize = 20
+      }else if(parameters[i].type == "string")
+      {
+        paramSize = 32 // TODO check this
+      }else if(parameters[i].type == "bool")
+      {
+        paramSize = 32
+      }else if(parameters[i].type == "uint256")
+      {
+        paramSize = 32
+      }
+
+      if(paramSize == 0) {
+        console.log("Error: invalid param at EVM generation")
+      }
+      labelMap.set(parameters[i].label, {calldataLocation: intToHex(4 + i*32), size: paramSize})
+    }
+
+    hexReturnValue = intToHex(parseInt(instructions[0].value))
+    if(functionName == "transfer" || functionName == "balanceOf") // transfer
+    {
+      returnValue = jumpLocation
+      for(let i=0; i<instructions.length; i++)
+      {
+        if(instructions[i].name == "operation")
+        {
+          returnValue += operation(instructions[i].lValue, instructions[i].rlValue, instructions[i].operator, instructions[i].rrValue)
+        }else if(instructions[i].name == "returnUint")
+        {
+          returnValue += returnLiteral(intToHex(instructions[i].value), "20")
+        }else if(instructions[i].name == "returnLabel")
+        {
+          returnValue += returnLabel(instructions[i].value, intToHex(32))
+        }
+      }
     }else
     {
       returnValue = jumpLocation

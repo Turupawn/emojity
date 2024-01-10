@@ -2,6 +2,14 @@ var currentToken
 var tokens
 var functions
 
+function nextToken()
+{
+    do {
+        currentToken+=1
+    }while(currentToken<tokens.length
+        && toEmoji(tokens[currentToken]) == '🛑')
+}
+
 function functionNameConversor(functionName)
 {
     if(functionName == "coinMoneyBag")
@@ -70,7 +78,7 @@ function parseNumber()
             default:
             return returnValue
         }
-        currentToken+=1
+        nextToken()
     } while(currentToken <= tokens.length)
     return returnValue
 }
@@ -118,7 +126,7 @@ function parseParameter()
             parameter = "bool"
         break;
         case '🔢':
-            currentToken+=1
+            nextToken()
             parameter = parseUint()
         break;
         default:
@@ -126,14 +134,14 @@ function parseParameter()
         return;
     }
 
-    currentToken+=1
+    nextToken()
 
-    identifier = toEmoji(tokens[currentToken])
+    let label = toEmoji(tokens[currentToken])
 
-    currentToken+=1
+    nextToken()
 
     returnValue = parseParameter()
-    returnValue.unshift({type: parameter, identifier: identifier})
+    returnValue.unshift({type: parameter, label: label})
     return returnValue
 }
 
@@ -143,10 +151,10 @@ function parseFunction()
         return;
     
     functionName = getEmojiDescription(toEmoji(tokens[currentToken]))
-    currentToken+=1
+    nextToken()
     functionName += getEmojiDescription(toEmoji(tokens[currentToken]))
     functionName = convertToFunctionName(functionName)
-    currentToken+=1
+    nextToken()
 
     visibility = ""
     switch (toEmoji(tokens[currentToken])) {
@@ -161,10 +169,10 @@ function parseFunction()
         return;
     }
 
-    currentToken+=1
+    nextToken()
     parameters = parseParameter()
 
-    currentToken+=1
+    nextToken()
     returnType = ""
     switch (toEmoji(tokens[currentToken])) {
         case '#️⃣':
@@ -177,7 +185,7 @@ function parseFunction()
             returnType = "bool"
         break;
         case '🔢':
-            currentToken+=1
+            nextToken()
             returnType = parseUint()
         break;
         default:
@@ -185,12 +193,14 @@ function parseFunction()
         return;
     }
 
-    currentToken+=1
+    nextToken()
 
     if(toEmoji(tokens[currentToken]) != '🏁')
     {
         console.log("Error: 🏁 expected, " + toEmoji(tokens[currentToken]) + ' found')
     }
+
+    currentToken += 1
 
     var instructions = []
     while(currentToken < tokens.length
@@ -198,21 +208,79 @@ function parseFunction()
     {
         if(toEmoji(tokens[currentToken]) == '↩️')
         {
-            currentToken+=1
-            returnValue = parseNumber()
-            instructions.push({instruction: "returnUint", value: returnValue})
-            break
+            nextToken()
+            let variable = parseVariable()
+            if(variable != "")
+            {
+                nextToken()
+                instructions.push({name: "returnLabel", value: variable})
+                break
+            }else
+            {
+                returnValue = parseNumber()
+                instructions.push({name: "returnUint", value: returnValue})
+                break
+            }
         }else
         {
-            currentToken+=1
+            let lValue = parseVariable()
+            if(lValue != "")
+            {
+                nextToken()
+                let rlValue = parseVariable()
+                let operator = ""
+                let rrValue = ""
+                if(toEmoji(tokens[currentToken]) == '➖')
+                {
+                    operator = '➖'
+                    nextToken()
+                    rrValue = parseVariable()
+                } else if(toEmoji(tokens[currentToken]) == '➕')
+                {
+                    operator = '➕'
+                    nextToken()
+                    rrValue = parseVariable()
+                }
+
+                instructions.push({name: "operation", lValue: lValue, rlValue: rlValue, operator: operator, rrValue: rrValue})
+            }else
+            {
+                nextToken()
+            }
         }
     }
 
-    currentToken+=1
+    nextToken()
 
     functions.push({name: functionNameConversor(functionName), parameters: parameters, returnType: returnType, visibility: visibility, instructions: instructions})
 
     parseFunction()
+}
+
+function parseVariable()
+{
+    let variableName = []
+    while(currentToken < tokens.length
+        && toEmoji(tokens[currentToken]) != '📥'
+        && toEmoji(tokens[currentToken]) != '➖'
+        && toEmoji(tokens[currentToken]) != '➕'
+        && toEmoji(tokens[currentToken]) != '🛑'
+        && toEmoji(tokens[currentToken]) != '0️⃣'
+        && toEmoji(tokens[currentToken]) != '1️⃣'
+        && toEmoji(tokens[currentToken]) != '2️⃣'
+        && toEmoji(tokens[currentToken]) != '3️⃣'
+        && toEmoji(tokens[currentToken]) != '4️⃣'
+        && toEmoji(tokens[currentToken]) != '5️⃣'
+        && toEmoji(tokens[currentToken]) != '6️⃣'
+        && toEmoji(tokens[currentToken]) != '7️⃣'
+        && toEmoji(tokens[currentToken]) != '8️⃣'
+        && toEmoji(tokens[currentToken]) != '9️⃣'
+        )
+    {
+        variableName.push(toEmoji(tokens[currentToken]))
+        currentToken+=1
+    }
+    return variableName
 }
 
 function getFunctionSignature(name, parameters)
@@ -249,13 +317,13 @@ const compile = async (unicodeCodePoints) => {
     {
         if(functions[i].returnType == "uint256")
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12", functions[i].instructions)
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), functions[i])
         }else if(functions[i].returnType == "string")
         {
-            functionLogics += functionLogic("d"+ String.fromCharCode(97+i), "61", functions[i].instructions)
+            functionLogics += functionLogic("d"+ String.fromCharCode(97+i), functions[i])
         }else
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), "12", functions[i].instructions)
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), functions[i])
         }
     }
   
