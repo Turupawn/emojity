@@ -68,5 +68,6 @@ async function readCSVFile(fileName) {
   }
   
   function getEmojiDescription(emojiCode, emojiMap) {
+    console.log(emojiCode)
     return emojiMap.get(emojiCode) || 'Unknown Emoji';
   }

@@ -1,3 +1,69 @@
+# Structure of a Contract
+
+## Emojidity Version
+
+## Install ERC
+
+## State variable
+
+State variables are variables whose values are permanently stored in contract storage.
+
+```
+🗺️💰
+```
+
+## Functions
+
+Functions are the executable units of code.
+
+```
+🪙🥧👀↩️🔢8️⃣
+🏁
+  ↩️1️⃣8️⃣
+🔚
+```
+
+Function Calls can either be view or public. Functions accept parameters and return variables to pass parameters and values between them.
+
+### Visibility
+
+#### 👀 View
+
+Functions can be declared view in which case they promise not to modify the state.
+
+#### 📢 Public
+
+Functions can be declared public in which case they can modify the state.
+
+### Parameters
+
+### Return value
+
+# Types
+
+## Uint
+
+## Bool
+
+## Address
+
+## String
+
+## Mapping
+
+## 2 Dimensional Mapping
+
+### Cheatsheet
+
+## Example contract
+
+## Example ERC20
+
+
+
+
+
+
 # State variable declaration
 
 ## Mapping
