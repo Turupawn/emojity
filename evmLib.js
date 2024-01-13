@@ -77,7 +77,7 @@ function getSelector(functionName) {
     {
       returnValue = "0" + returnValue
     }
-    return returnValue
+    return returnValue.toUpperCase()
   }
   
   function modifyChar(originalString, index, newChar) {
@@ -163,10 +163,19 @@ function getSelector(functionName) {
       labelMap.set(parameters[i].label, {calldataLocation: intToHex(4 + i*32), size: paramSize})
     }
 
+    let returnValue
+
     hexReturnValue = intToHex(parseInt(instructions[0].value))
-    if(functionName == "transfer" || functionName == "balanceOf") // transfer
+    if(functionName == "transfer"
+      || functionName == "balanceOf"
+      || functionName == "approve"
+      || functionName == "increaseAllowance"
+      || functionName == "decreaseAllowance"
+      || functionName == "allowance"
+      || functionName == "transferFrom") // transfer
     {
       returnValue = jumpLocation
+
       for(let i=0; i<instructions.length; i++)
       {
         if(instructions[i].name == "operation")
@@ -174,7 +183,12 @@ function getSelector(functionName) {
           returnValue += operation(instructions[i].lValue, instructions[i].rlValue, instructions[i].operator, instructions[i].rrValue)
         }else if(instructions[i].name == "returnUint")
         {
-          returnValue += returnLiteral(intToHex(instructions[i].value), "20")
+          console.log("->" + functionName)
+          returnValue += returnLiteral(intToHex(parseInt(instructions[i].value)), "20")
+          if(functionName == "allowance")
+          {
+            console.log(returnValue)
+          }
         }else if(instructions[i].name == "returnLabel")
         {
           returnValue += returnLabel(instructions[i].value, intToHex(32))
@@ -182,11 +196,16 @@ function getSelector(functionName) {
       }
     }else
     {
+      console.log("<<" + functionName)
+      console.log("<<" + hexReturnValue)
+
       returnValue = jumpLocation
       + push(hexReturnValue)
       + push("00")
       + OPCODE_MSTORE
       + rReturn("00", "20")
+
+      console.log(returnValue)
     }
 
     return returnValue

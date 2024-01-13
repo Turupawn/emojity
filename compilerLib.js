@@ -30,6 +30,10 @@ function functionNameConversor(functionName)
         return "symbol"
     if(functionName == "coinPie")
         return "decimals"
+    if(functionName == "coinUpArrow")
+        return "increaseAllowance"
+    if(functionName == "coinDownArrow")
+        return "decreaseAllowance"
 
     return functionName
 }
@@ -309,7 +313,7 @@ const compile = async (unicodeCodePoints) => {
     for(i=0; i<functions.length; i++)
     {
         functionSignature = getFunctionSignature(functions[i].name, functions[i].parameters)
-        selectorLookups += selectorLookup(functionSignature, "j"+ String.fromCharCode(97+i))
+        selectorLookups += selectorLookup(functionSignature, "j"+ String.fromCharCode(109+i))
     }
   
     functionLogics = ""
@@ -317,13 +321,13 @@ const compile = async (unicodeCodePoints) => {
     {
         if(functions[i].returnType == "uint256")
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), functions[i])
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(109+i), functions[i])
         }else if(functions[i].returnType == "string")
         {
-            functionLogics += functionLogic("d"+ String.fromCharCode(97+i), functions[i])
+            functionLogics += functionLogic("d"+ String.fromCharCode(109+i), functions[i])
         }else
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(97+i), functions[i])
+            functionLogics += functionIntLogic("d"+ String.fromCharCode(109+i), functions[i])
         }
     }
   
@@ -352,6 +356,9 @@ const compile = async (unicodeCodePoints) => {
     contractBodySize = intToHex(contractBody.length/2)
   
     // Setup Jump Destinations
+    console.log(contractBody)
+
+
     for(var i=0; i<contractBody.length; i+=2)
     {
       if(contractBody[i]=='j')
@@ -372,6 +379,7 @@ const compile = async (unicodeCodePoints) => {
         }
       }
     }
+
   
     // Setup OPCODE_JUMPDEST
     for(var i=0; i<contractBody.length; i+=2)
