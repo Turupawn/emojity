@@ -115,6 +115,7 @@ function putLabelOnStack(label) {
     let senderOnTopOfStack = putSenderOnStack()
     return senderOnTopOfStack
   }
+
   let calldataLocation = labelMap.get(label).calldataLocation
   let size = labelMap.get(label).size
 
@@ -158,8 +159,32 @@ function putMappingValueOnState(mapLocation, keyLabel, keySize) {
     + storeTopOfStackInMemory("00")
     + push(mapLocation) // TODO: Need to allow more than 16 mappings
     + storeTopOfStackInMemory(intToHex(keySize))
-    + keccak256("00", intToHex(keySize + 32)) // Get my balance key
-    + OPCODE_SSTORE // Get my balance
+    + keccak256("00", intToHex(keySize + 32))
+    + OPCODE_SSTORE
+  return returnValue
+}
+
+function put2dMappingValueOnStack(mapLocation, keyLabelA, keyLabelB, keySize) {
+  let returnValue = putLabelOnStack(keyLabelA)
+    + storeTopOfStackInMemory("00")
+    + putLabelOnStack(keyLabelB)
+    + storeTopOfStackInMemory(intToHex(32))
+    + push(mapLocation)
+    + storeTopOfStackInMemory(intToHex(64))
+    + keccak256("00", intToHex(32 * 3))
+    + OPCODE_SLOAD
+  return returnValue
+}
+
+function put2dMappingValueOnState(mapLocation, keyLabelA, keyLabelB, keySize) {
+  let returnValue = putLabelOnStack(keyLabelA)
+    + storeTopOfStackInMemory("00")
+    + putLabelOnStack(keyLabelB)
+    + storeTopOfStackInMemory(intToHex(32))
+    + push(mapLocation)
+    + storeTopOfStackInMemory(intToHex(64))
+    + keccak256("00", intToHex(32 * 3))
+    + OPCODE_SSTORE
   return returnValue
 }
 
@@ -172,6 +197,10 @@ function putValueOnStack(label) {
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
     return putMappingValueOnStack(mapLocation, label[1], 20) // currently only address arrays
+  }else if(label.length == 3)
+  {
+    let mapLocation = intToHex(stateVariables.get(label[0]).position)
+    return put2dMappingValueOnStack(mapLocation, label[1], label[2], 20) // currently only address arrays
   }else{
     console.log("Error: Invalid label length while trying to put it on stack")
   }
@@ -185,9 +214,12 @@ function putValueOnState(label) {
     // TODO: IMPLEMENT THIS
   }else if(label.length == 2)
   {
-    //TODO: Implement mapping labels and also multidimensional mappings
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
     return putMappingValueOnState(mapLocation, label[1], 20) // TODO: Currently on array mappins
+  }else if(label.length == 3)
+  {
+    let mapLocation = intToHex(stateVariables.get(label[0]).position)
+    return put2dMappingValueOnState(mapLocation, label[1], label[2], 20) // TODO: Currently on array mappins
   }else{
     console.log("Error: Invalid label length while triying to put it on state")
   }
@@ -209,6 +241,12 @@ function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Oper
     returnValue += OPCODE_ADD
   }else if(operator == '➖')
   {
+    returnValue += OPCODE_DUP1 // Uint underflow prevention
+    returnValue += OPCODE_DUP3
+    returnValue += OPCODE_GT
+    returnValue += push("jR00")
+    returnValue += OPCODE_JUMPI
+
     returnValue += OPCODE_SUB
   }
   returnValue += putValueOnState(lValue)

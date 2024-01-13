@@ -401,6 +401,8 @@ const compile = async (unicodeCodePoints) => {
     + OPCODE_POP
     + OPCODE_SWAP1
     + OPCODE_JUMP
+    + "dR"
+    + OPCODE_REVERT
 
     //contractBody = begin + push(functionSelector) + end
     contractBodySize = intToHex(contractBody.length/2)
