@@ -52,7 +52,7 @@ function getSelector(functionName) {
       + OPCODE_MUL
       + push("00")
       + OPCODE_MSTORE
-      + keccak256("00", "14") // Get Key Position
+      + keccak256("00", "34") // Get Key Position wich is 14 of the sender + 32 for mapping position results in 52 in decimal 34 in hex
       + OPCODE_SSTORE // Store new value
       + codeCopy("00", offset, contractSize)
       + rReturn("00", contractSize)
@@ -167,7 +167,6 @@ function getSelector(functionName) {
 
     hexReturnValue = intToHex(parseInt(instructions[0].value))
     returnValue = jumpLocation
-
     for(let i=0; i<instructions.length; i++)
     {
       if(instructions[i].name == "operation")

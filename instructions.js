@@ -142,19 +142,23 @@ function putSenderOnStack() {
   return returnValue
 }
 
-function putMappingValueOnStack(keyLabel, keySize) {
+function putMappingValueOnStack(mapLocation, keyLabel, keySize) {
   let returnValue = putLabelOnStack(keyLabel)
     + storeTopOfStackInMemory("00")
-    + keccak256("00", keySize) // Get my balance key
-    + OPCODE_SLOAD // Get my balance
+    + push(mapLocation) // TODO: Need to allow more than 16 mappings
+    + storeTopOfStackInMemory(intToHex(keySize))
+    + keccak256("00", intToHex(keySize + 32))
+    + OPCODE_SLOAD
 
   return returnValue
 }
 
-function putMappingValueOnState(keyLabel, keySize) {
+function putMappingValueOnState(mapLocation, keyLabel, keySize) {
   let returnValue = putLabelOnStack(keyLabel)
     + storeTopOfStackInMemory("00")
-    + keccak256("00", keySize) // Get my balance key
+    + push(mapLocation) // TODO: Need to allow more than 16 mappings
+    + storeTopOfStackInMemory(intToHex(keySize))
+    + keccak256("00", intToHex(keySize + 32)) // Get my balance key
     + OPCODE_SSTORE // Get my balance
   return returnValue
 }
@@ -166,7 +170,8 @@ function putValueOnStack(label) {
     return putLabelOnStack(label[0])
   }else if(label.length == 2)
   {
-    return putMappingValueOnStack(label[1], intToHex(20))
+    let mapLocation = intToHex(stateVariables.get(label[0]).position)
+    return putMappingValueOnStack(mapLocation, label[1], 20) // currently only address arrays
   }else{
     console.log("Error: Invalid label length while trying to put it on stack")
   }
@@ -180,7 +185,9 @@ function putValueOnState(label) {
     // TODO: IMPLEMENT THIS
   }else if(label.length == 2)
   {
-    return putMappingValueOnState(label[1], intToHex(20))
+    //TODO: Implement mapping labels and also multidimensional mappings
+    let mapLocation = intToHex(stateVariables.get(label[0]).position)
+    return putMappingValueOnState(mapLocation, label[1], 20) // TODO: Currently on array mappins
   }else{
     console.log("Error: Invalid label length while triying to put it on state")
   }
@@ -210,8 +217,6 @@ function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Oper
 
 function assignment(lValue, rValue) // lValue = rValue
 {
-  console.log(lValue)
-  console.log(rValue)
   let returnValue = ""
   returnValue += putValueOnStack(rValue)
   returnValue += putValueOnState(lValue)

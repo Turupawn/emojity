@@ -1,6 +1,7 @@
 var currentToken
 var tokens
 var functions
+var stateVariables = new Map()
 
 function nextToken()
 {
@@ -304,10 +305,57 @@ function getFunctionSignature(name, parameters)
     return returnValue
 }
 
+function parseStateVariable()
+{
+    let type = ""
+
+    switch (toEmoji(tokens[currentToken])) {
+        case '🗺️':
+            type = "mapping"
+        break
+        case '#️⃣':
+            type = "address"
+        break;
+        case '🔡':
+            type = "string"
+        break;
+        case '☯️':
+            type = "bool"
+        break;
+        case '🔢':
+            nextToken()
+            parameter = parseUint()
+        break;
+    }
+
+    if(type == "")
+    {
+        return false
+    }
+
+    nextToken()
+
+    let label = toEmoji(tokens[currentToken])
+
+    nextToken()
+
+    stateVariables.set(label, {type: type, position: stateVariables.size})
+    return true
+}
+
 const compile = async (unicodeCodePoints) => {
     currentToken = 0
     tokens = unicodeCodePoints
     functions = []
+
+    parseStateVariable()
+    parseStateVariable()
+
+    let stateValuefound
+    do
+    {
+        stateValuefound = parseStateVariable()
+    }while(stateValuefound)
 
     parseFunction()
 

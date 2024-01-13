@@ -44,6 +44,8 @@ function toEmoji(unicodeCodePoint)
     return '#️⃣'
   case '262f':
     return '☯️'
+  case '1f5fa':
+    return '🗺️'
   }
   
   return String.fromCodePoint(unicodeCodePoint.split('-').map(hex => parseInt(hex, 16)))
