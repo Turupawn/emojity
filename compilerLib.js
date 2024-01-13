@@ -245,8 +245,10 @@ function parseFunction()
                     nextToken()
                     rrValue = parseVariable()
                 }
-
-                instructions.push({name: "operation", lValue: lValue, rlValue: rlValue, operator: operator, rrValue: rrValue})
+                if(operator != "")
+                    instructions.push({name: "operation", lValue: lValue, rlValue: rlValue, operator: operator, rrValue: rrValue})
+                else
+                    instructions.push({name: "assignment", lValue: lValue, rValue: rlValue})
             }else
             {
                 nextToken()
@@ -356,9 +358,6 @@ const compile = async (unicodeCodePoints) => {
     contractBodySize = intToHex(contractBody.length/2)
   
     // Setup Jump Destinations
-    console.log(contractBody)
-
-
     for(var i=0; i<contractBody.length; i+=2)
     {
       if(contractBody[i]=='j')

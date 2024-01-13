@@ -207,3 +207,13 @@ function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Oper
   returnValue += putValueOnState(lValue)
   return returnValue
 }
+
+function assignment(lValue, rValue) // lValue = rValue
+{
+  console.log(lValue)
+  console.log(rValue)
+  let returnValue = ""
+  returnValue += putValueOnStack(rValue)
+  returnValue += putValueOnState(lValue)
+  return returnValue
+}

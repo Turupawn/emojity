@@ -166,47 +166,23 @@ function getSelector(functionName) {
     let returnValue
 
     hexReturnValue = intToHex(parseInt(instructions[0].value))
-    if(functionName == "transfer"
-      || functionName == "balanceOf"
-      || functionName == "approve"
-      || functionName == "increaseAllowance"
-      || functionName == "decreaseAllowance"
-      || functionName == "allowance"
-      || functionName == "transferFrom") // transfer
-    {
-      returnValue = jumpLocation
+    returnValue = jumpLocation
 
-      for(let i=0; i<instructions.length; i++)
+    for(let i=0; i<instructions.length; i++)
+    {
+      if(instructions[i].name == "operation")
       {
-        if(instructions[i].name == "operation")
-        {
-          returnValue += operation(instructions[i].lValue, instructions[i].rlValue, instructions[i].operator, instructions[i].rrValue)
-        }else if(instructions[i].name == "returnUint")
-        {
-          console.log("->" + functionName)
-          returnValue += returnLiteral(intToHex(parseInt(instructions[i].value)), "20")
-          if(functionName == "allowance")
-          {
-            console.log(returnValue)
-          }
-        }else if(instructions[i].name == "returnLabel")
-        {
-          returnValue += returnLabel(instructions[i].value, intToHex(32))
-        }
+        returnValue += operation(instructions[i].lValue, instructions[i].rlValue, instructions[i].operator, instructions[i].rrValue)
+      }else if(instructions[i].name == "returnUint")
+      {
+        returnValue += returnLiteral(intToHex(parseInt(instructions[i].value)), "20")
+      }else if(instructions[i].name == "returnLabel")
+      {
+        returnValue += returnLabel(instructions[i].value, intToHex(32))
+      }else if(instructions[i].name == "assignment")
+      {
+        returnValue += assignment(instructions[i].lValue, instructions[i].rValue)
       }
-    }else
-    {
-      console.log("<<" + functionName)
-      console.log("<<" + hexReturnValue)
-
-      returnValue = jumpLocation
-      + push(hexReturnValue)
-      + push("00")
-      + OPCODE_MSTORE
-      + rReturn("00", "20")
-
-      console.log(returnValue)
     }
-
     return returnValue
   }
