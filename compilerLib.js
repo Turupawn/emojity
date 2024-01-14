@@ -2,6 +2,7 @@ var currentToken
 var tokens
 var functions
 var stateVariables = new Map()
+var constructorInstructions = []
 
 function nextToken()
 {
@@ -150,6 +151,74 @@ function parseParameter()
     return returnValue
 }
 
+function parseInstructions()
+{
+    let instructions = []
+    while(currentToken < tokens.length
+            && toEmoji(tokens[currentToken]) != '🔚')
+    {
+        if(toEmoji(tokens[currentToken]) == '↩️')
+        {
+            nextToken()
+            let variable = parseVariable()
+            if(variable != "")
+            {
+                nextToken()
+                instructions.push({name: "returnLabel", value: variable})
+                break
+            }else
+            {
+                returnValue = parseNumber()
+                instructions.push({name: "returnUint", value: returnValue})
+                break
+            }
+        }else
+        {
+            let lValue = parseVariable()
+            if(lValue != "")
+            {
+                nextToken()
+                let rlValue = parseVariable()
+                if(rlValue!="")
+                {
+                    let operator = ""
+                    let rrValue = ""
+                    if(toEmoji(tokens[currentToken]) == '➖')
+                    {
+                        operator = '➖'
+                        nextToken()
+                        rrValue = parseVariable()
+                    } else if(toEmoji(tokens[currentToken]) == '➕')
+                    {
+                        operator = '➕'
+                        nextToken()
+                        rrValue = parseVariable()
+                    }
+                    if(operator != "")
+                        instructions.push({name: "operation", lValue: lValue, rlValue: rlValue, operator: operator, rrValue: rrValue})
+                    else
+                        instructions.push({name: "assignment", lValue: lValue, rValue: rlValue})
+                }else
+                {
+                    rlValue = parseNumber()
+                    if(rlValue!="")
+                    {
+                        instructions.push({name: "literalAssignment", lValue: lValue, rValue: rlValue})
+                    }else
+                    {
+                        console.log("Error: Could not parse instruction")
+                    }
+                }
+            }else
+            {
+                nextToken()
+            }
+        }
+    }
+
+    return instructions
+}
+
 function parseFunction()
 {
     if(currentToken >= tokens.length)
@@ -207,55 +276,7 @@ function parseFunction()
 
     currentToken += 1
 
-    var instructions = []
-    while(currentToken < tokens.length
-            && toEmoji(tokens[currentToken]) != '🔚')
-    {
-        if(toEmoji(tokens[currentToken]) == '↩️')
-        {
-            nextToken()
-            let variable = parseVariable()
-            if(variable != "")
-            {
-                nextToken()
-                instructions.push({name: "returnLabel", value: variable})
-                break
-            }else
-            {
-                returnValue = parseNumber()
-                instructions.push({name: "returnUint", value: returnValue})
-                break
-            }
-        }else
-        {
-            let lValue = parseVariable()
-            if(lValue != "")
-            {
-                nextToken()
-                let rlValue = parseVariable()
-                let operator = ""
-                let rrValue = ""
-                if(toEmoji(tokens[currentToken]) == '➖')
-                {
-                    operator = '➖'
-                    nextToken()
-                    rrValue = parseVariable()
-                } else if(toEmoji(tokens[currentToken]) == '➕')
-                {
-                    operator = '➕'
-                    nextToken()
-                    rrValue = parseVariable()
-                }
-                if(operator != "")
-                    instructions.push({name: "operation", lValue: lValue, rlValue: rlValue, operator: operator, rrValue: rrValue})
-                else
-                    instructions.push({name: "assignment", lValue: lValue, rValue: rlValue})
-            }else
-            {
-                nextToken()
-            }
-        }
-    }
+    let instructions = parseInstructions()
 
     nextToken()
 
@@ -343,19 +364,38 @@ function parseStateVariable()
     return true
 }
 
+function parseConstructor() {
+    if(toEmoji(tokens[currentToken]) != '👷')
+        return
+    nextToken()
+    if(toEmoji(tokens[currentToken]) != '🏁')
+    {
+        console.log("Error: 🏁 expected in constructor")
+        return
+    }
+    nextToken()
+    constructorInstructions = parseInstructions()
+
+    if(toEmoji(tokens[currentToken]) != '🔚')
+    {
+        console.log("Error: 🔚 expected at the end of constructor")
+        return
+    }
+    nextToken()
+}
+
 const compile = async (unicodeCodePoints) => {
     currentToken = 0
     tokens = unicodeCodePoints
     functions = []
-
-    parseStateVariable()
-    parseStateVariable()
 
     let stateValuefound
     do
     {
         stateValuefound = parseStateVariable()
     }while(stateValuefound)
+
+    parseConstructor()
 
     parseFunction()
 

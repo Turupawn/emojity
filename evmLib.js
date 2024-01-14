@@ -33,155 +33,180 @@ async function loadWeb3() {
 loadWeb3()
 
 function getSelector(functionName) {
-    let hash = web3.utils.soliditySha3(web3.utils.toHex(functionName))
-    return hash.substring(2).substring(0, 8)
-  }
+  let hash = web3.utils.soliditySha3(web3.utils.toHex(functionName))
+  return hash.substring(2).substring(0, 8)
+}
   
-  function contractHeader(contractSize) {
-    let deltaWithoutContractSizeAdjutment = 45
-    offset = intToHex((deltaWithoutContractSizeAdjutment + (contractSize.length*3)/2))
-    while(contractSize.length > offset.length)
-    {
-      offset = "00" + offset
-    }
-
-    returnValue = ""// Constructor
-      + push("3635C9ADC5DEA00000") // Token amount
-      + OPCODE_CALLER // msg.sender
-      + push("01000000000000000000000000")
-      + OPCODE_MUL
-      + push("00")
-      + OPCODE_MSTORE
-      + keccak256("00", "34") // Get Key Position wich is 14 of the sender + 32 for mapping position results in 52 in decimal 34 in hex
-      + OPCODE_SSTORE // Store new value
-      + codeCopy("00", offset, contractSize)
-      + rReturn("00", contractSize)
-      + OPCODE_INVALID
-
-    console.log("Offset: " + deltaWithoutContractSizeAdjutment )
-    console.log("Length: " + (returnValue.length- contractSize.length*3)/2)
-
-    if(deltaWithoutContractSizeAdjutment != (returnValue.length- contractSize.length*3)/2)
-    {
-      console.log("Error: Invalid contract delta size adjustment")
-    }
-
-    return returnValue
-  }
-  
-  function intToHex(num) {
-
-    returnValue = (num).toString(16).toUpperCase()
-
-    if(returnValue.length%2 != 0)
-    {
-      returnValue = "0" + returnValue
-    }
-    return returnValue.toUpperCase()
-  }
-  
-  function modifyChar(originalString, index, newChar) {
-    if (index < 0 || index >= originalString.length) {
-        // Index out of bounds
-        return originalString;
-    }
-  
-    // Create a new string with the modified character
-    return (
-        originalString.substr(0, index) + newChar + originalString.substr(index + 1)
-    );
-  }
-  
-  function selectorLookup(signature, destination) {
-    if(destination.length==2)
-      destination = destination+"00"
-
-    returnValue =  push(getSelector(signature).toUpperCase())
-      + OPCODE_DUP2
-      + OPCODE_EQ
-      + push(destination)
-      + OPCODE_JUMPI
-  
-    return returnValue
-  }
-  
-  function functionLogic(jumpLocation, functionData)
+function contractHeader(contractSize) {
+  offetPlaceholder = "QQ"//intToHex((deltaWithoutContractSizeAdjutment + (contractSize.length*3)/2))
+  while(contractSize.length > offetPlaceholder.length)
   {
-    let functionName = functionData.name
-    let parameters = functionData.parameters
-    let instructions = functionData.instructions
-
-    let literalValue = intToHex(parseInt(instructions[0].value))
-    let literalInstructionLength = intToHex(literalValue.length/2)
-
-    while(literalValue.length < 64)
-    {
-      literalValue+="0"
-    }
-    
-    returnValue = jumpLocation
-      + push("20")//start?
-      + push("00")
-      + OPCODE_MSTORE
-      + push(literalInstructionLength)// length
-      + push("20")
-      + OPCODE_MSTORE
-      + push(literalValue)
-      + push("40")
-      + OPCODE_MSTORE
-      + rReturn("00", "60")
-    return returnValue
+    offetPlaceholder = "QQ" + offetPlaceholder
   }
+  let constructorBytecode = convertInstructionToBytecode(constructorInstructions)
 
-  function functionIntLogic(jumpLocation, functionData)
+  let returnValue = ""// Constructor
+    + constructorBytecode
+    + codeCopy("00", offetPlaceholder, contractSize)
+    + rReturn("00", contractSize)
+    + OPCODE_INVALID
+
+  let realOffset = intToHex(returnValue.length/2)
+
+  for(let i=returnValue.length-1;i>=0; i--)
   {
-    let functionName = functionData.name
-    let parameters = functionData.parameters
-    let instructions = functionData.instructions
-
-    labelMap = new Map()
-    for(i=0; i<parameters.length; i++)
+    if(returnValue[i]=='Q')
     {
-      let paramSize = 0
-      if(parameters[i].type == "address")
+      for(let j=realOffset.length-1;j>=0; j--)
       {
-        paramSize = 20
-      }else if(parameters[i].type == "string")
-      {
-        paramSize = 32 // TODO check this
-      }else if(parameters[i].type == "bool")
-      {
-        paramSize = 32
-      }else if(parameters[i].type == "uint256")
-      {
-        paramSize = 32
+        returnValue = modifyChar(returnValue,i,realOffset[j])
+        i-=1
       }
-
-      if(paramSize == 0) {
-        console.log("Error: invalid param at EVM generation")
+      while(returnValue[i]=='Q')
+      {
+        returnValue = modifyChar(returnValue,i,'0')
+        i-=1
       }
-      labelMap.set(parameters[i].label, {calldataLocation: intToHex(4 + i*32), size: paramSize})
+      break
     }
-
-    let returnValue
-
-    hexReturnValue = intToHex(parseInt(instructions[0].value))
-    returnValue = jumpLocation
-    for(let i=0; i<instructions.length; i++)
-    {
-      if(instructions[i].name == "operation")
-      {
-        returnValue += operation(instructions[i].lValue, instructions[i].rlValue, instructions[i].operator, instructions[i].rrValue)
-      }else if(instructions[i].name == "returnUint")
-      {
-        returnValue += returnLiteral(intToHex(parseInt(instructions[i].value)), "20")
-      }else if(instructions[i].name == "returnLabel")
-      {
-        returnValue += returnLabel(instructions[i].value, intToHex(32))
-      }else if(instructions[i].name == "assignment")
-      {
-        returnValue += assignment(instructions[i].lValue, instructions[i].rValue)
-      }
-    }
-    return returnValue
   }
+  return returnValue
+}
+
+function intToHex(num) {
+
+  returnValue = (num).toString(16).toUpperCase()
+
+  if(returnValue.length%2 != 0)
+  {
+    returnValue = "0" + returnValue
+  }
+  return returnValue.toUpperCase()
+}
+
+function modifyChar(originalString, index, newChar) {
+  if (index < 0 || index >= originalString.length) {
+      // Index out of bounds
+      return originalString;
+  }
+
+  // Create a new string with the modified character
+  return (
+      originalString.substr(0, index) + newChar + originalString.substr(index + 1)
+  );
+}
+
+function selectorLookup(signature, destination) {
+  if(destination.length==2)
+    destination = destination+"00"
+
+  returnValue =  push(getSelector(signature).toUpperCase())
+    + OPCODE_DUP2
+    + OPCODE_EQ
+    + push(destination)
+    + OPCODE_JUMPI
+
+  return returnValue
+}
+
+function functionLogic(jumpLocation, functionData)
+{
+  let functionName = functionData.name
+  let parameters = functionData.parameters
+  let instructions = functionData.instructions
+
+  let literalValue = intToHex(parseInt(instructions[0].value))
+  let literalInstructionLength = intToHex(literalValue.length/2)
+
+  while(literalValue.length < 64)
+  {
+    literalValue+="0"
+  }
+
+  returnValue = jumpLocation
+    + push("20")//start?
+    + push("00")
+    + OPCODE_MSTORE
+    + push(literalInstructionLength)// length
+    + push("20")
+    + OPCODE_MSTORE
+    + push(literalValue)
+    + push("40")
+    + OPCODE_MSTORE
+    + rReturn("00", "60")
+  return returnValue
+}
+
+function functionIntLogic(jumpLocation, functionData)
+{
+  let functionName = functionData.name
+  let parameters = functionData.parameters
+  let instructions = functionData.instructions
+
+  labelMap = new Map()
+  for(i=0; i<parameters.length; i++)
+  {
+    let paramSize = 0
+    if(parameters[i].type == "address")
+    {
+      paramSize = 20
+    }else if(parameters[i].type == "string")
+    {
+      paramSize = 32 // TODO check this
+    }else if(parameters[i].type == "bool")
+    {
+      paramSize = 32
+    }else if(parameters[i].type == "uint256")
+    {
+      paramSize = 32
+    }
+
+    if(paramSize == 0) {
+      console.log("Error: invalid param at EVM generation")
+    }
+    labelMap.set(parameters[i].label, {calldataLocation: intToHex(4 + i*32), size: paramSize})
+  }
+
+  let returnValue
+
+  returnValue = jumpLocation
+
+  /*
+  // TODO: Implement logs
+  if(functionName == "transferFrom")
+  {
+    console.log("Traa")
+    let eventSignature = getFunctionSignature("Transfer", [{type: "address"},{type: "address"},{type: "uint256"}])
+    let eventSignatureHash = getSelector(eventSignature).toUpperCase()
+    console.log(eventSignature)
+    console.log(eventSignatureHash)
+  }
+  */
+
+  returnValue += convertInstructionToBytecode(instructions)
+  return returnValue
+}
+
+function convertInstructionToBytecode(instructionsParam) {
+  let returnValue = ""
+  for(let i=0; i<instructionsParam.length; i++)
+  {
+    if(instructionsParam[i].name == "operation")
+    {
+      returnValue += operation(instructionsParam[i].lValue, instructionsParam[i].rlValue, instructionsParam[i].operator, instructionsParam[i].rrValue)
+    }else if(instructionsParam[i].name == "returnUint")
+    {
+      returnValue += returnLiteral(intToHex(parseInt(instructionsParam[i].value)), "20")
+    }else if(instructionsParam[i].name == "returnLabel")
+    {
+      returnValue += returnLabel(instructionsParam[i].value, intToHex(32))
+    }else if(instructionsParam[i].name == "assignment")
+    {
+      returnValue += assignment(instructionsParam[i].lValue, instructionsParam[i].rValue)
+    }else if(instructionsParam[i].name == "literalAssignment")
+    {
+      returnValue += literalAssignment(instructionsParam[i].lValue, intToHex(parseInt(instructionsParam[i].rValue)))
+    }
+  }
+  return returnValue
+}

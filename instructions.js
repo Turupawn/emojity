@@ -260,3 +260,11 @@ function assignment(lValue, rValue) // lValue = rValue
   returnValue += putValueOnState(lValue)
   return returnValue
 }
+
+function literalAssignment(lValue, rValue) // lValue = rValue
+{
+  let returnValue = ""
+  returnValue += push(rValue)
+  returnValue += putValueOnState(lValue)
+  return returnValue
+}
