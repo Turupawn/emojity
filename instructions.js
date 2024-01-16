@@ -97,7 +97,7 @@ function returnLiteral(value, size) {
 }
 
 function returnLabel(label, size) {
-  let returnValue = putValueOnStack(label) // Return true
+  let returnValue = putValueOnStack(label, false/* wtf is this */) // Return true
         + storeTopOfStackInMemory("00")
         + rReturn("00", size)
   return returnValue
@@ -110,7 +110,7 @@ function keccak256(offset, size) {
   return returnValue
 }
 
-function putLabelOnStack(label) {
+function putLabelOnStack(label, performSizeAdjustement) {
   if(label == '👤') {
     let senderOnTopOfStack = putSenderOnStack()
     return senderOnTopOfStack
@@ -121,7 +121,8 @@ function putLabelOnStack(label) {
 
   let returnValue = push(calldataLocation) // Put address on memory
     + OPCODE_CALLDATALOAD
-  if(size != 32)
+
+  if(performSizeAdjustement && size != 32)
   {
     let sizeAdjustement = "01"
     for (let i = 0; i < 32-size; i++) {
@@ -137,14 +138,14 @@ function putLabelOnStack(label) {
 function putSenderOnStack() {
   
   let returnValue =  OPCODE_CALLER // Get my address
-  + push("01000000000000000000000000")
-  + OPCODE_MUL
+  //+ push("01000000000000000000000000")
+  //+ OPCODE_MUL
 
   return returnValue
 }
 
-function putMappingValueOnStack(mapLocation, keyLabel, keySize) {
-  let returnValue = putLabelOnStack(keyLabel)
+function putMappingValueOnStack(mapLocation, keyLabel, keySize, performSizeAdjustement) {
+  let returnValue = putLabelOnStack(keyLabel, performSizeAdjustement)
     + storeTopOfStackInMemory("00")
     + push(mapLocation) // TODO: Need to allow more than 16 mappings
     + storeTopOfStackInMemory(intToHex(keySize))
@@ -154,8 +155,8 @@ function putMappingValueOnStack(mapLocation, keyLabel, keySize) {
   return returnValue
 }
 
-function putMappingValueOnState(mapLocation, keyLabel, keySize) {
-  let returnValue = putLabelOnStack(keyLabel)
+function putMappingValueOnState(mapLocation, keyLabel, keySize, performSizeAdjustement) {
+  let returnValue = putLabelOnStack(keyLabel, performSizeAdjustement)
     + storeTopOfStackInMemory("00")
     + push(mapLocation) // TODO: Need to allow more than 16 mappings
     + storeTopOfStackInMemory(intToHex(keySize))
@@ -164,10 +165,10 @@ function putMappingValueOnState(mapLocation, keyLabel, keySize) {
   return returnValue
 }
 
-function put2dMappingValueOnStack(mapLocation, keyLabelA, keyLabelB, keySize) {
-  let returnValue = putLabelOnStack(keyLabelA)
+function put2dMappingValueOnStack(mapLocation, keyLabelA, keyLabelB, keySize, performSizeAdjustement) {
+  let returnValue = putLabelOnStack(keyLabelA, performSizeAdjustement)
     + storeTopOfStackInMemory("00")
-    + putLabelOnStack(keyLabelB)
+    + putLabelOnStack(keyLabelB, performSizeAdjustement)
     + storeTopOfStackInMemory(intToHex(32))
     + push(mapLocation)
     + storeTopOfStackInMemory(intToHex(64))
@@ -176,10 +177,10 @@ function put2dMappingValueOnStack(mapLocation, keyLabelA, keyLabelB, keySize) {
   return returnValue
 }
 
-function put2dMappingValueOnState(mapLocation, keyLabelA, keyLabelB, keySize) {
-  let returnValue = putLabelOnStack(keyLabelA)
+function put2dMappingValueOnState(mapLocation, keyLabelA, keyLabelB, keySize, performSizeAdjustement) {
+  let returnValue = putLabelOnStack(keyLabelA, performSizeAdjustement)
     + storeTopOfStackInMemory("00")
-    + putLabelOnStack(keyLabelB)
+    + putLabelOnStack(keyLabelB, performSizeAdjustement)
     + storeTopOfStackInMemory(intToHex(32))
     + push(mapLocation)
     + storeTopOfStackInMemory(intToHex(64))
@@ -188,25 +189,25 @@ function put2dMappingValueOnState(mapLocation, keyLabelA, keyLabelB, keySize) {
   return returnValue
 }
 
-function putValueOnStack(label) {
+function putValueOnStack(label, performSizeAdjustement) {
 
   if(label.length == 1)
   {
-    return putLabelOnStack(label[0])
+    return putLabelOnStack(label[0], performSizeAdjustement)
   }else if(label.length == 2)
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
-    return putMappingValueOnStack(mapLocation, label[1], 20) // currently only address arrays
+    return putMappingValueOnStack(mapLocation, label[1], 20, performSizeAdjustement) // currently only address arrays
   }else if(label.length == 3)
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
-    return put2dMappingValueOnStack(mapLocation, label[1], label[2], 20) // currently only address arrays
+    return put2dMappingValueOnStack(mapLocation, label[1], label[2], 20, performSizeAdjustement) // currently only address arrays
   }else{
     console.log("Error: Invalid label length while trying to put it on stack")
   }
 }
 
-function putValueOnState(label) {
+function putValueOnState(label, performSizeAdjustement) {
 
   if(label.length == 1)
   {
@@ -215,11 +216,11 @@ function putValueOnState(label) {
   }else if(label.length == 2)
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
-    return putMappingValueOnState(mapLocation, label[1], 20) // TODO: Currently on array mappins
+    return putMappingValueOnState(mapLocation, label[1], 20, performSizeAdjustement) // TODO: Currently on array mappins
   }else if(label.length == 3)
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
-    return put2dMappingValueOnState(mapLocation, label[1], label[2], 20) // TODO: Currently on array mappins
+    return put2dMappingValueOnState(mapLocation, label[1], label[2], 20, performSizeAdjustement) // TODO: Currently on array mappins
   }else{
     console.log("Error: Invalid label length while triying to put it on state")
   }
@@ -234,8 +235,8 @@ function storeTopOfStackInMemory(offset) {
 function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Operator] rrValue
 {
   let returnValue = ""
-  returnValue += putValueOnStack(rrValue)
-  returnValue += putValueOnStack(rlValue)
+  returnValue += putValueOnStack(rrValue, false/* wtf is this */)
+  returnValue += putValueOnStack(rlValue, false/* wtf is this */)
   if(operator == '➕')
   {
     returnValue += OPCODE_ADD
@@ -249,15 +250,15 @@ function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Oper
 
     returnValue += OPCODE_SUB
   }
-  returnValue += putValueOnState(lValue)
+  returnValue += putValueOnState(lValue, false/* wtf is this */)
   return returnValue
 }
 
 function assignment(lValue, rValue) // lValue = rValue
 {
   let returnValue = ""
-  returnValue += putValueOnStack(rValue)
-  returnValue += putValueOnState(lValue)
+  returnValue += putValueOnStack(rValue, false/* wtf is this */)
+  returnValue += putValueOnState(lValue, false/* wtf is this */)
   return returnValue
 }
 
@@ -265,6 +266,46 @@ function literalAssignment(lValue, rValue) // lValue = rValue
 {
   let returnValue = ""
   returnValue += push(rValue)
-  returnValue += putValueOnState(lValue)
+  returnValue += putValueOnState(lValue, false/* wtf is this */)
+  return returnValue
+}
+
+  // TODO: Implement logs
+function logEvent(topics)
+{
+  console.log(topics)
+
+  let eventSignature = getEmojiDescription(topics[0][0]) + getEmojiDescription(topics[0][1])
+  eventSignature = functionNameConversor(convertToFunctionName(eventSignature))
+  let eventSignatureHash = getSelector(eventSignature).toUpperCase()
+
+  let topic0 = eventSignatureHash
+  let topic1 = topics[1]
+  let topic2 = topics[2]
+  let data = topics[3]
+
+  let returnValue = ""
+  if(Array.isArray(data))
+    returnValue += putValueOnStack(data, false)
+  else
+    returnValue += push(intToHex(parseInt(data)))
+  returnValue += push("00")
+  returnValue += OPCODE_MSTORE
+
+  if(Array.isArray(topic2))
+    returnValue += putValueOnStack(topic2, false)
+  else
+    returnValue += push(intToHex(parseInt(topic2)))
+
+  if(Array.isArray(topic1))
+    returnValue += putValueOnStack(topic1, false)
+  else
+    returnValue += push(intToHex(parseInt(topic1)))
+
+  returnValue += push(topic0)
+    + push(intToHex(32))
+    + push("00")
+    + OPCODE_LOG3
+
   return returnValue
 }

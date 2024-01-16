@@ -34,7 +34,7 @@ loadWeb3()
 
 function getSelector(functionName) {
   let hash = web3.utils.soliditySha3(web3.utils.toHex(functionName))
-  return hash.substring(2).substring(0, 8)
+  return hash.substring(2)
 }
   
 function contractHeader(contractSize) {
@@ -100,7 +100,7 @@ function selectorLookup(signature, destination) {
   if(destination.length==2)
     destination = destination+"00"
 
-  returnValue =  push(getSelector(signature).toUpperCase())
+  returnValue =  push(getSelector(signature).substring(0, 8).toUpperCase())
     + OPCODE_DUP2
     + OPCODE_EQ
     + push(destination)
@@ -171,19 +171,8 @@ function functionIntLogic(jumpLocation, functionData)
 
   returnValue = jumpLocation
 
-  /*
-  // TODO: Implement logs
-  if(functionName == "transferFrom")
-  {
-    console.log("Traa")
-    let eventSignature = getFunctionSignature("Transfer", [{type: "address"},{type: "address"},{type: "uint256"}])
-    let eventSignatureHash = getSelector(eventSignature).toUpperCase()
-    console.log(eventSignature)
-    console.log(eventSignatureHash)
-  }
-  */
-
   returnValue += convertInstructionToBytecode(instructions)
+
   return returnValue
 }
 
@@ -206,6 +195,9 @@ function convertInstructionToBytecode(instructionsParam) {
     }else if(instructionsParam[i].name == "literalAssignment")
     {
       returnValue += literalAssignment(instructionsParam[i].lValue, intToHex(parseInt(instructionsParam[i].rValue)))
+    }else if(instructionsParam[i].name == "logEvent")
+    {
+      returnValue += logEvent(instructionsParam[i].topics)
     }
   }
   return returnValue

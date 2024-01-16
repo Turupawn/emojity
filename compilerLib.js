@@ -36,6 +36,8 @@ function functionNameConversor(functionName)
         return "increaseAllowance"
     if(functionName == "coinDownArrow")
         return "decreaseAllowance"
+    if(functionName == "coinDeliveryTruck")
+        return "Transfer(address,address,uint256)"
 
     return functionName
 }
@@ -172,6 +174,23 @@ function parseInstructions()
                 instructions.push({name: "returnUint", value: returnValue})
                 break
             }
+        }else if(toEmoji(tokens[currentToken]) == '📑')
+        {
+            let topics = []
+            while(toEmoji(tokens[currentToken]) == '📑')
+            {
+                nextToken()
+                let variable = parseVariable()
+                if(variable != "")
+                {
+                    topics.push(variable)
+                }else
+                {
+                    number = parseNumber()
+                    topics.push(number)
+                }
+            }
+            instructions.push({name: "logEvent", topics})
         }else
         {
             let lValue = parseVariable()
@@ -303,6 +322,7 @@ function parseVariable()
         && toEmoji(tokens[currentToken]) != '7️⃣'
         && toEmoji(tokens[currentToken]) != '8️⃣'
         && toEmoji(tokens[currentToken]) != '9️⃣'
+        && toEmoji(tokens[currentToken]) != '📑'
         )
     {
         variableName.push(toEmoji(tokens[currentToken]))
