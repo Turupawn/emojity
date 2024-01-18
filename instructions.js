@@ -97,6 +97,9 @@ function returnLiteral(value, size) {
 }
 
 function returnLabel(label, size) {
+  console.log("Return")
+  console.log(label)
+  console.log(size)
   let returnValue = putValueOnStack(label, false/* wtf is this */) // Return true
         + storeTopOfStackInMemory("00")
         + rReturn("00", size)
@@ -116,11 +119,29 @@ function putLabelOnStack(label, performSizeAdjustement) {
     return senderOnTopOfStack
   }
 
-  let calldataLocation = labelMap.get(label).calldataLocation
-  let size = labelMap.get(label).size
+  let returnValue = ""
 
-  let returnValue = push(calldataLocation) // Put address on memory
-    + OPCODE_CALLDATALOAD
+  let size
+
+  if(labelMap.has(label))
+  {
+    console.log("Calladata")
+    let calldataLocation = labelMap.get(label).calldataLocation
+    size = labelMap.get(label).size
+    returnValue += push(calldataLocation)
+      + OPCODE_CALLDATALOAD
+  }else if(stateVariables.has(label))
+  {
+    console.log("State")
+    size = 32
+    let slot = stateVariables.get(label).position
+    console.log("Slot:" + slot)
+    returnValue += push(intToHex(slot))
+      + OPCODE_SLOAD
+  }else
+  {
+    console.log("Error: Could not find label on the calldata nor state")
+  }
 
   if(performSizeAdjustement && size != 32)
   {
@@ -131,6 +152,8 @@ function putLabelOnStack(label, performSizeAdjustement) {
     returnValue += push(sizeAdjustement)
       + OPCODE_MUL
   }
+
+  console.log(returnValue)
 
   return returnValue
 }
@@ -152,6 +175,21 @@ function putMappingValueOnStack(mapLocation, keyLabel, keySize, performSizeAdjus
     + keccak256("00", intToHex(keySize + 32))
     + OPCODE_SLOAD
 
+  return returnValue
+}
+
+function putLabelValueOnState(label) {
+  let slot = ""
+  if(stateVariables.has(label))
+  {
+    slot = stateVariables.get(label).position
+  }else
+  {
+    console.log("Error: Could not find label on state while trying to store")
+  }
+
+  let returnValue = push(intToHex(slot))
+    + OPCODE_SSTORE
   return returnValue
 }
 
@@ -211,8 +249,7 @@ function putValueOnState(label, performSizeAdjustement) {
 
   if(label.length == 1)
   {
-    //return putLabelOnState(label[0])
-    // TODO: IMPLEMENT THIS
+    return putLabelValueOnState(label[0])
   }else if(label.length == 2)
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
@@ -235,7 +272,11 @@ function storeTopOfStackInMemory(offset) {
 function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Operator] rrValue
 {
   let returnValue = ""
-  returnValue += putValueOnStack(rrValue, false/* wtf is this */)
+  if(Array.isArray(rrValue)) {
+    returnValue += putValueOnStack(rrValue, false/* wtf is this */)
+  } else {
+    returnValue += push(intToHex(rrValue))
+  }
   returnValue += putValueOnStack(rlValue, false/* wtf is this */)
   if(operator == '➕')
   {
@@ -273,8 +314,6 @@ function literalAssignment(lValue, rValue) // lValue = rValue
   // TODO: Implement logs
 function logEvent(topics)
 {
-  console.log(topics)
-
   let eventSignature = getEmojiDescription(topics[0][0]) + getEmojiDescription(topics[0][1])
   eventSignature = functionNameConversor(convertToFunctionName(eventSignature))
   let eventSignatureHash = getSelector(eventSignature).toUpperCase()
@@ -289,8 +328,8 @@ function logEvent(topics)
     returnValue += putValueOnStack(data, false)
   else
     returnValue += push(intToHex(parseInt(data)))
-  returnValue += push("00")
-  returnValue += OPCODE_MSTORE
+
+  returnValue += storeTopOfStackInMemory("00")
 
   if(Array.isArray(topic2))
     returnValue += putValueOnStack(topic2, false)

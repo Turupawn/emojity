@@ -205,13 +205,20 @@ function parseInstructions()
                     if(toEmoji(tokens[currentToken]) == '➖')
                     {
                         operator = '➖'
-                        nextToken()
-                        rrValue = parseVariable()
                     } else if(toEmoji(tokens[currentToken]) == '➕')
                     {
                         operator = '➕'
-                        nextToken()
-                        rrValue = parseVariable()
+                    }
+                    nextToken()
+                    rrValue = parseVariable()
+
+                    if(rrValue == "")
+                    {
+                        rrValue = parseNumber()
+                    }
+                    if(rrValue == "")
+                    {
+                        console.log("Error: invalid rrValue while parsing operation")
                     }
                     if(operator != "")
                         instructions.push({name: "operation", lValue: lValue, rlValue: rlValue, operator: operator, rrValue: rrValue})
@@ -258,7 +265,8 @@ function parseFunction()
             visibility = "nonpayable"
         break;
         default:
-        console.log("Error: missing function visibility")
+            console.log(toEmoji(tokens[currentToken]))
+            console.log("Error: missing function visibility")
         return;
     }
 
@@ -365,7 +373,8 @@ function parseStateVariable()
         break;
         case '🔢':
             nextToken()
-            parameter = parseUint()
+            type = parseUint()
+            //parameter = parseUint()
         break;
     }
 
@@ -408,6 +417,7 @@ const compile = async (unicodeCodePoints) => {
     currentToken = 0
     tokens = unicodeCodePoints
     functions = []
+    stateVariables = new Map()
 
     let stateValuefound
     do
@@ -419,6 +429,7 @@ const compile = async (unicodeCodePoints) => {
 
     parseFunction()
 
+    console.log(functions)
     selectorLookups = ""
     for(i=0; i<functions.length; i++)
     {

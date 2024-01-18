@@ -180,6 +180,7 @@ function convertInstructionToBytecode(instructionsParam) {
   let returnValue = ""
   for(let i=0; i<instructionsParam.length; i++)
   {
+    console.log(instructionsParam[i].name)
     if(instructionsParam[i].name == "operation")
     {
       returnValue += operation(instructionsParam[i].lValue, instructionsParam[i].rlValue, instructionsParam[i].operator, instructionsParam[i].rrValue)
