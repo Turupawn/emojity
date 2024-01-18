@@ -265,8 +265,7 @@ function parseFunction()
             visibility = "nonpayable"
         break;
         default:
-            console.log(toEmoji(tokens[currentToken]))
-            console.log("Error: missing function visibility")
+            console.log("Error: missing function visibility found " + toEmoji(tokens[currentToken]))
         return;
     }
 
@@ -429,7 +428,6 @@ const compile = async (unicodeCodePoints) => {
 
     parseFunction()
 
-    console.log(functions)
     selectorLookups = ""
     for(i=0; i<functions.length; i++)
     {

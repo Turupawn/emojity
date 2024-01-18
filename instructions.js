@@ -97,9 +97,6 @@ function returnLiteral(value, size) {
 }
 
 function returnLabel(label, size) {
-  console.log("Return")
-  console.log(label)
-  console.log(size)
   let returnValue = putValueOnStack(label, false/* wtf is this */) // Return true
         + storeTopOfStackInMemory("00")
         + rReturn("00", size)
@@ -125,17 +122,14 @@ function putLabelOnStack(label, performSizeAdjustement) {
 
   if(labelMap.has(label))
   {
-    console.log("Calladata")
     let calldataLocation = labelMap.get(label).calldataLocation
     size = labelMap.get(label).size
     returnValue += push(calldataLocation)
       + OPCODE_CALLDATALOAD
   }else if(stateVariables.has(label))
   {
-    console.log("State")
     size = 32
     let slot = stateVariables.get(label).position
-    console.log("Slot:" + slot)
     returnValue += push(intToHex(slot))
       + OPCODE_SLOAD
   }else
@@ -152,8 +146,6 @@ function putLabelOnStack(label, performSizeAdjustement) {
     returnValue += push(sizeAdjustement)
       + OPCODE_MUL
   }
-
-  console.log(returnValue)
 
   return returnValue
 }
