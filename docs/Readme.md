@@ -35,6 +35,8 @@ Functions are the executable units of code.
 
 Function Calls can either be view or public. Functions accept parameters and return variables to pass parameters and values between them.
 
+They are composed of a two emoji names, the visibility, parameters and a return value 
+
 ### Visibility
 
 #### 👀 View
