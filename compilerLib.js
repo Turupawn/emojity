@@ -510,21 +510,61 @@ const compile = async (unicodeCodePoints) => {
     }
   
     var abi = '['
-  
-    for(i=0; i<functions.length; i++)
+    for(let i=0; i<functions.length; i++)
     {
+      let fn = functions[i]
       if(i!=0)
       {
         abi += ','
       }
-      abi += '{"inputs": [],"name": "'
-      abi += functions[i].name
-      abi += '","outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"}'
+      abi += '{"inputs": ['
+      for(let j=0; j<fn.parameters.length; j++)
+      {
+        let parameter = fn.parameters[j]
+        console.log(parameter)
+      }
+      abi += '],"name": "'
+      abi += fn.name
+      abi += '","outputs": ['
+      if(fn.returnType)
+      {
+          abi += '{"internalType": "'
+          abi += fn.returnType
+          abi += '", "name": "", "type": "'
+          abi += fn.returnType
+          abi += '"}'
+      }
+      abi += '], "stateMutability": "'
+      abi += fn.visibility
+      abi += '", "type": "function"}'
     }
     abi += "]"
-  
+
+
+    let solidityInterface = '// SPDX-License-Identifier: MIT\n'
+    solidityInterface += 'pragma solidity ^0.8.20;\n\n'
+    solidityInterface += 'interface EmojiContract {\n'
+    for(let i=0; i<functions.length; i++)
+    {
+      let fn = functions[i]
+      solidityInterface += '\tfunction '
+      solidityInterface += fn.name + '() external '
+      if(fn.visibility == "view")
+      {
+        solidityInterface += 'view '
+      }
+
+      if(fn.returnType)
+      {
+        solidityInterface += 'returns (' + fn.returnType + ')'
+      }
+      solidityInterface += ';\n'
+    }
+    solidityInterface += '}'
+
     document.getElementById("_bytecode").value = contractHeader(contractBodySize) + contractBody
     document.getElementById("_abi").value = abi
+    document.getElementById("_solidityInterface").value = solidityInterface
   }
 
 
