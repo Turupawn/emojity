@@ -49,7 +49,7 @@ function contractHeader(contractSize) {
     + constructorBytecode
     + codeCopy("00", offetPlaceholder, contractSize)
     + rReturn("00", contractSize)
-    + OPCODE_INVALID
+    + opcodeMap.get("INVALID")
 
   let realOffset = intToHex(returnValue.length/2)
 
@@ -101,10 +101,10 @@ function selectorLookup(signature, destination) {
     destination = destination+"00"
 
   returnValue =  push(getSelector(signature).substring(0, 8).toUpperCase())
-    + OPCODE_DUP2
-    + OPCODE_EQ
+    + opcodeMap.get("DUP2")
+    + opcodeMap.get("EQ")
     + push(destination)
-    + OPCODE_JUMPI
+    + opcodeMap.get("JUMPI")
 
   return returnValue
 }
@@ -126,13 +126,13 @@ function functionLogic(jumpLocation, functionData)
   returnValue = jumpLocation
     + push("20")//start?
     + push("00")
-    + OPCODE_MSTORE
+    + opcodeMap.get("MSTORE")
     + push(literalInstructionLength)// length
     + push("20")
-    + OPCODE_MSTORE
+    + opcodeMap.get("MSTORE")
     + push(literalValue)
     + push("40")
-    + OPCODE_MSTORE
+    + opcodeMap.get("MSTORE")
     + rReturn("00", "60")
   return returnValue
 }

@@ -473,25 +473,25 @@ const compile = async (unicodeCodePoints) => {
     contractBody = ""
     + push("j100")
     + push("j000")
-    + OPCODE_JUMP
+    + opcodeMap.get("JUMP")
     + "d1"
     + selectorLookups
     + push("00")
-    + OPCODE_DUP1
-    + OPCODE_REVERT
+    + opcodeMap.get("DUP1")
+    + opcodeMap.get("REVERT")
     + functionLogics
     + "d0"
     + push("00")
     + push("0100000000000000000000000000000000000000000000000000000000")
     + push("00")
-    + OPCODE_CALLDATALOAD
-    + OPCODE_DIV
-    + OPCODE_SWAP1
-    + OPCODE_POP
-    + OPCODE_SWAP1
-    + OPCODE_JUMP
+    + opcodeMap.get("CALLDATALOAD")
+    + opcodeMap.get("DIV")
+    + opcodeMap.get("SWAP1")
+    + opcodeMap.get("POP")
+    + opcodeMap.get("SWAP1")
+    + opcodeMap.get("JUMP")
     + "dR"
-    + OPCODE_REVERT
+    + opcodeMap.get("REVERT")
 
     //contractBody = begin + push(functionSelector) + end
     contractBodySize = intToHex(contractBody.length/2)
@@ -519,7 +519,7 @@ const compile = async (unicodeCodePoints) => {
     }
 
   
-    // Setup OPCODE_JUMPDEST
+    // Setup JUMPDEST
     for(var i=0; i<contractBody.length; i+=2)
     {
       if(contractBody[i]=='d')
@@ -586,8 +586,10 @@ const compile = async (unicodeCodePoints) => {
         if(j!=0)
             solidityInterface += ","
         solidityInterface += parameterType
-            + " "
-            + parameterName
+        if(parameterType == "string")
+            solidityInterface += " memory"
+        solidityInterface += " "
+        solidityInterface +=parameterName
       }
       solidityInterface += ') external '
       if(fn.visibility == "view")
@@ -597,7 +599,10 @@ const compile = async (unicodeCodePoints) => {
 
       if(fn.returnType)
       {
-        solidityInterface += 'returns (' + fn.returnType + ')'
+        solidityInterface += 'returns (' + fn.returnType
+        if(fn.returnType == "string")
+            solidityInterface += " memory"
+        solidityInterface += ')'
       }
       solidityInterface += ';\n'
     }

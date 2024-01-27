@@ -1,74 +1,74 @@
 function push(value) {
   if(value.length == 2)
-    return OPCODE_PUSH1 + value
+    return opcodeMap.get("PUSH1") + value
   if(value.length == 4)
-    return OPCODE_PUSH2 + value
+    return opcodeMap.get("PUSH2") + value
   if(value.length == 6)
-    return OPCODE_PUSH3 + value
+    return opcodeMap.get("PUSH3") + value
   if(value.length == 8)
-    return OPCODE_PUSH4 + value
+    return opcodeMap.get("PUSH4") + value
   if(value.length == 10)
-    return OPCODE_PUSH5 + value
+    return opcodeMap.get("PUSH5") + value
 
   if(value.length == 12)
-    return OPCODE_PUSH6 + value
+    return opcodeMap.get("PUSH6") + value
   if(value.length == 14)
-    return OPCODE_PUSH7 + value
+    return opcodeMap.get("PUSH7") + value
   if(value.length == 16)
-    return OPCODE_PUSH8 + value
+    return opcodeMap.get("PUSH8") + value
   if(value.length == 18)
-    return OPCODE_PUSH9 + value
+    return opcodeMap.get("PUSH9") + value
   if(value.length == 20)
-    return OPCODE_PUSH10 + value
+    return opcodeMap.get("PUSH10") + value
 
   if(value.length == 22)
-    return OPCODE_PUSH11 + value
+    return opcodeMap.get("PUSH11") + value
   if(value.length == 24)
-    return OPCODE_PUSH12 + value
+    return opcodeMap.get("PUSH12") + value
   if(value.length == 26)
-    return OPCODE_PUSH13 + value
+    return opcodeMap.get("PUSH13") + value
   if(value.length == 28)
-    return OPCODE_PUSH14 + value
+    return opcodeMap.get("PUSH14") + value
   if(value.length == 30)
-    return OPCODE_PUSH15 + value
+    return opcodeMap.get("PUSH15") + value
 
   if(value.length == 32)
-    return OPCODE_PUSH16 + value
+    return opcodeMap.get("PUSH16") + value
   if(value.length == 34)
-    return OPCODE_PUSH17 + value
+    return opcodeMap.get("PUSH17") + value
   if(value.length == 36)
-    return OPCODE_PUSH18 + value
+    return opcodeMap.get("PUSH18") + value
   if(value.length == 38)
-    return OPCODE_PUSH19 + value
+    return opcodeMap.get("PUSH19") + value
   if(value.length == 40)
-    return OPCODE_PUSH20 + value
+    return opcodeMap.get("PUSH20") + value
 
   if(value.length == 42)
-    return OPCODE_PUSH21 + value
+    return opcodeMap.get("PUSH21") + value
   if(value.length == 44)
-    return OPCODE_PUSH22 + value
+    return opcodeMap.get("PUSH22") + value
   if(value.length == 46)
-    return OPCODE_PUSH23 + value
+    return opcodeMap.get("PUSH23") + value
   if(value.length == 48)
-    return OPCODE_PUSH24 + value
+    return opcodeMap.get("PUSH24") + value
   if(value.length == 50)
-    return OPCODE_PUSH25 + value
+    return opcodeMap.get("PUSH25") + value
 
   if(value.length == 52)
-    return OPCODE_PUSH26 + value
+    return opcodeMap.get("PUSH26") + value
   if(value.length == 54)
-    return OPCODE_PUSH27 + value
+    return opcodeMap.get("PUSH27") + value
   if(value.length == 56)
-    return OPCODE_PUSH28 + value
+    return opcodeMap.get("PUSH28") + value
   if(value.length == 58)
-    return OPCODE_PUSH29 + value
+    return opcodeMap.get("PUSH29") + value
   if(value.length == 60)
-    return OPCODE_PUSH30 + value
+    return opcodeMap.get("PUSH30") + value
 
   if(value.length == 62)
-    return OPCODE_PUSH31 + value
+    return opcodeMap.get("PUSH31") + value
   if(value.length == 64)
-    return OPCODE_PUSH32 + value
+    return opcodeMap.get("PUSH32") + value
   
   console.log("ERROR VALUE: " + value)
   return "PUSHERROR"
@@ -78,14 +78,14 @@ function codeCopy(destOffest, offest, size) {
   returnValue = push(size)
     + push(offest)
     + push(destOffest)
-    + OPCODE_CODECOPY
+    + opcodeMap.get("CODECOPY")
   return returnValue
 }
 
 function rReturn(offset, size) {
   returnValue = push(size)
     + push(offset)
-    + OPCODE_RETURN
+    + opcodeMap.get("RETURN")
   return returnValue
 }
 
@@ -106,7 +106,7 @@ function returnLabel(label, size) {
 function keccak256(offset, size) {
   returnValue = push(size)
     + push(offset)
-    + OPCODE_KECCAK256
+    + opcodeMap.get("KECCAK256")
   return returnValue
 }
 
@@ -126,9 +126,9 @@ function putLabelOnStack(label, performSizeAdjustement) {
     size = labelMap.get(label).size
     returnValue += push(position)
     if(labelMap.get(label).location == "calldata") {
-      returnValue += OPCODE_CALLDATALOAD
+      returnValue += opcodeMap.get("CALLDATALOAD")
     } else if(labelMap.get(label).location == "memory") {
-      returnValue += OPCODE_MLOAD
+      returnValue += opcodeMap.get("MLOAD")
     } else
     {
       console.log("ERROR: Invalid location, expected calldata or memory")
@@ -138,7 +138,7 @@ function putLabelOnStack(label, performSizeAdjustement) {
     size = 32
     let slot = stateVariables.get(label).position
     returnValue += push(intToHex(slot))
-      + OPCODE_SLOAD
+      + opcodeMap.get("SLOAD")
   }else
   {
     console.log("Error: Could not find label on the calldata nor state: " + label)
@@ -151,7 +151,7 @@ function putLabelOnStack(label, performSizeAdjustement) {
       sizeAdjustement += "00";
     }
     returnValue += push(sizeAdjustement)
-      + OPCODE_MUL
+      + opcodeMap.get("MUL")
   }
 
   return returnValue
@@ -159,9 +159,9 @@ function putLabelOnStack(label, performSizeAdjustement) {
 
 function putSenderOnStack() {
   
-  let returnValue =  OPCODE_CALLER // Get my address
+  let returnValue =  opcodeMap.get("CALLER") // Get my address
   //+ push("01000000000000000000000000")
-  //+ OPCODE_MUL
+  //+ opcodeMap.get("MUL")
 
   return returnValue
 }
@@ -172,7 +172,7 @@ function putMappingValueOnStack(mapLocation, keyLabel, keySize, performSizeAdjus
     + push(mapLocation) // TODO: Need to allow more than 16 mappings
     + storeTopOfStackInMemory(intToHex(keySize))
     + keccak256("00", intToHex(keySize + 32))
-    + OPCODE_SLOAD
+    + opcodeMap.get("SLOAD")
 
   return returnValue
 }
@@ -194,10 +194,10 @@ function putLabelValueOnState(label) {
   let returnValue = push(intToHex(slot))
   if(location == "state")
   {
-    returnValue += OPCODE_SSTORE
+    returnValue += opcodeMap.get("SSTORE")
   }else if(location == "memory")
   {
-    returnValue += OPCODE_MSTORE
+    returnValue += opcodeMap.get("MSTORE")
   }
   return returnValue
 }
@@ -208,7 +208,7 @@ function putMappingValueOnState(mapLocation, keyLabel, keySize, performSizeAdjus
     + push(mapLocation) // TODO: Need to allow more than 16 mappings
     + storeTopOfStackInMemory(intToHex(keySize))
     + keccak256("00", intToHex(keySize + 32))
-    + OPCODE_SSTORE
+    + opcodeMap.get("SSTORE")
   return returnValue
 }
 
@@ -220,7 +220,7 @@ function put2dMappingValueOnStack(mapLocation, keyLabelA, keyLabelB, keySize, pe
     + push(mapLocation)
     + storeTopOfStackInMemory(intToHex(64))
     + keccak256("00", intToHex(32 * 3))
-    + OPCODE_SLOAD
+    + opcodeMap.get("SLOAD")
   return returnValue
 }
 
@@ -232,7 +232,7 @@ function put2dMappingValueOnState(mapLocation, keyLabelA, keyLabelB, keySize, pe
     + push(mapLocation)
     + storeTopOfStackInMemory(intToHex(64))
     + keccak256("00", intToHex(32 * 3))
-    + OPCODE_SSTORE
+    + opcodeMap.get("SSTORE")
   return returnValue
 }
 
@@ -274,7 +274,7 @@ function putValueOnState(label, performSizeAdjustement) {
 
 function storeTopOfStackInMemory(offset) {
   let returnValue = push(offset)
-    + OPCODE_MSTORE
+    + opcodeMap.get("MSTORE")
   return returnValue
 }
 
@@ -289,16 +289,16 @@ function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Oper
   returnValue += putValueOnStack(rlValue, false/* wtf is this */)
   if(operator == '➕')
   {
-    returnValue += OPCODE_ADD
+    returnValue += opcodeMap.get("ADD")
   }else if(operator == '➖')
   {
-    returnValue += OPCODE_DUP1 // Uint underflow prevention
-    returnValue += OPCODE_DUP3
-    returnValue += OPCODE_GT
+    returnValue += opcodeMap.get("DUP1") // Uint underflow prevention
+    returnValue += opcodeMap.get("DUP3")
+    returnValue += opcodeMap.get("GT")
     returnValue += push("jR00")
-    returnValue += OPCODE_JUMPI
+    returnValue += opcodeMap.get("JUMPI")
 
-    returnValue += OPCODE_SUB
+    returnValue += opcodeMap.get("SUB")
   }
   returnValue += putValueOnState(lValue, false/* wtf is this */)
   return returnValue
@@ -353,7 +353,7 @@ function logEvent(topics)
   returnValue += push(topic0)
     + push(intToHex(32))
     + push("00")
-    + OPCODE_LOG3
+    + opcodeMap.get("LOG3")
 
   return returnValue
 }

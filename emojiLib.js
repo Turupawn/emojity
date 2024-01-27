@@ -1,11 +1,19 @@
-const EMOJI_CSV_PATH = "./emoji.csv"
+const EMOJI_CSV_PATH = "./csv/emojis.csv"
+const OPCODE_CSV_PATH = "./csv/opcodes.csv"
 
 var emojiMap
+var opcodeMap
 
 async function loadEmojiLib() {
-    readCSVFile(EMOJI_CSV_PATH).then(data => {
-        emojiMap = parseCSVData(data);  
-    });
+  readCSVFile(EMOJI_CSV_PATH).then(data => {
+      emojiMap = parseCSVData(data);
+  });
+}
+
+async function loadOpcodeLib() {
+  readCSVFile(OPCODE_CSV_PATH).then(data => {
+    opcodeMap = parseCSVData(data);
+  });
 }
 
 /*
