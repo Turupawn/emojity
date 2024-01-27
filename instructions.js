@@ -122,10 +122,17 @@ function putLabelOnStack(label, performSizeAdjustement) {
 
   if(labelMap.has(label))
   {
-    let calldataLocation = labelMap.get(label).calldataLocation
+    let position = labelMap.get(label).position
     size = labelMap.get(label).size
-    returnValue += push(calldataLocation)
-      + OPCODE_CALLDATALOAD
+    returnValue += push(position)
+    if(labelMap.get(label).location == "calldata") {
+      returnValue += OPCODE_CALLDATALOAD
+    } else if(labelMap.get(label).location == "memory") {
+      returnValue += OPCODE_MLOAD
+    } else
+    {
+      console.log("ERROR: Invalid location, expected calldata or memory")
+    }
   }else if(stateVariables.has(label))
   {
     size = 32
@@ -134,7 +141,7 @@ function putLabelOnStack(label, performSizeAdjustement) {
       + OPCODE_SLOAD
   }else
   {
-    console.log("Error: Could not find label on the calldata nor state")
+    console.log("Error: Could not find label on the calldata nor state: " + label)
   }
 
   if(performSizeAdjustement && size != 32)
@@ -172,16 +179,26 @@ function putMappingValueOnStack(mapLocation, keyLabel, keySize, performSizeAdjus
 
 function putLabelValueOnState(label) {
   let slot = ""
+  let location = "state"
   if(stateVariables.has(label))
   {
     slot = stateVariables.get(label).position
+  }else if(labelMap.has(label))
+  {
+    slot = labelMap.get(label).position
+    location = labelMap.get(label).location
   }else
   {
-    console.log("Error: Could not find label on state while trying to store")
+    console.log("Error: Could not find label on state while trying to store: " + label)
   }
-
   let returnValue = push(intToHex(slot))
-    + OPCODE_SSTORE
+  if(location == "state")
+  {
+    returnValue += OPCODE_SSTORE
+  }else if(location == "memory")
+  {
+    returnValue += OPCODE_MSTORE
+  }
   return returnValue
 }
 

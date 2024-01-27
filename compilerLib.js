@@ -191,6 +191,26 @@ function parseInstructions()
                 }
             }
             instructions.push({name: "logEvent", topics})
+        }else if(toEmoji(tokens[currentToken]) == '#️⃣')
+        {
+            nextToken()
+            let label = parseVariable()
+            instructions.push({name: "declareAddress", label: label})
+        }else if(toEmoji(tokens[currentToken]) == '🔡')
+        {
+            nextToken()
+            let label = parseVariable()
+            instructions.push({name: "declareString", label: label})
+        }else if(toEmoji(tokens[currentToken]) == '☯️')
+        {
+            nextToken()
+            let label = parseVariable()
+            instructions.push({name: "declareBool", label: label})
+        }else if(toEmoji(tokens[currentToken]) == '🔢')
+        {
+            nextToken()
+            let label = parseVariable()
+            instructions.push({name: "declareUint", label: label})
         }else
         {
             let lValue = parseVariable()
@@ -521,7 +541,14 @@ const compile = async (unicodeCodePoints) => {
       for(let j=0; j<fn.parameters.length; j++)
       {
         let parameter = fn.parameters[j]
-        console.log(parameter)
+        let parameterName = getEmojiDescription(parameter.label)
+        parameterName = parameterName.charAt(0).toLowerCase() + parameterName.slice(1);
+        let parameterType = parameter.type
+        abi += '{"name":"'
+        abi += parameterName
+        abi += '","type":"'
+        abi += parameterType
+        abi += '"}'
       }
       abi += '],"name": "'
       abi += fn.name
@@ -548,7 +575,21 @@ const compile = async (unicodeCodePoints) => {
     {
       let fn = functions[i]
       solidityInterface += '\tfunction '
-      solidityInterface += fn.name + '() external '
+      solidityInterface += fn.name + '('
+      for(let j=0; j<fn.parameters.length; j++)
+      {
+        let parameter = fn.parameters[j]
+        let parameterName = getEmojiDescription(parameter.label)
+        parameterName = parameterName.charAt(0).toLowerCase() + parameterName.slice(1);
+        let parameterType = parameter.type
+
+        if(j!=0)
+            solidityInterface += ","
+        solidityInterface += parameterType
+            + " "
+            + parameterName
+      }
+      solidityInterface += ') external '
       if(fn.visibility == "view")
       {
         solidityInterface += 'view '

@@ -17,6 +17,24 @@
 🔚
 ```
 
+### Calculator
+
+```
+🍊➕👀🔢🍇🔢🍓↩️🔢
+🏁
+  🔢🍊
+  🍊📥🍇➕🍓
+  ↩️🍊
+🔚
+
+🍊➖👀🔢🍇🔢🍓↩️🔢
+🏁
+  🔢🍊
+  🍊📥🍇➖🍓
+  ↩️🍊
+🔚
+```
+
 ### ERC20 Token
 
 ```
@@ -106,10 +124,13 @@ FUNCTION_3
 State variables are variables whose values are permanently stored in contract storage.
 
 ```
-🗺️💰
+🔢🍓 // Uint variable declared on the stack
+🗺️💰 // This is hashmap
 ```
 
 ## Constructor
+
+The costructor code will be executed only once, when the contract is deployed.
 
 ```
 👷

@@ -164,7 +164,7 @@ function functionIntLogic(jumpLocation, functionData)
     if(paramSize == 0) {
       console.log("Error: invalid param at EVM generation")
     }
-    labelMap.set(parameters[i].label, {calldataLocation: intToHex(4 + i*32), size: paramSize})
+    labelMap.set(parameters[i].label, {position: intToHex(4 + i*32), size: paramSize, location: "calldata"})
   }
 
   let returnValue
@@ -198,6 +198,9 @@ function convertInstructionToBytecode(instructionsParam) {
     }else if(instructionsParam[i].name == "logEvent")
     {
       returnValue += logEvent(instructionsParam[i].topics)
+    }else if(instructionsParam[i].name == "declareUint")
+    {
+      labelMap.set(instructionsParam[i].label[0], {position: intToHex(0), size: 32, location: "memory"})
     }
   }
   return returnValue
