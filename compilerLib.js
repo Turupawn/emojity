@@ -448,86 +448,46 @@ const compile = async (unicodeCodePoints) => {
 
     parseFunction()
 
-    selectorLookups = ""
-    for(i=0; i<functions.length; i++)
+    irCode = []
+
+    addPushJump("1")
+    addPushJump("0")
+    addOpcode("JUMP")
+    addJumpDestination("1")
+    for(let i=0; i<functions.length; i++)
     {
         functionSignature = getFunctionSignature(functions[i].name, functions[i].parameters)
-        selectorLookups += selectorLookup(functionSignature, "j"+ String.fromCharCode(109+i))
+        selectorLookupIr(functionSignature, String.fromCharCode(109+i))
     }
-  
-    functionLogics = ""
-    for(i=0; i<functions.length; i++)
+    addPush("00")
+    addOpcode("DUP1")
+    addOpcode("REVERT")
+    for(let i=0; i<functions.length; i++)
     {
-        if(functions[i].returnType == "uint256")
+        if(functions[i].returnType == "string")
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(109+i), functions[i])
-        }else if(functions[i].returnType == "string")
-        {
-            functionLogics += functionLogic("d"+ String.fromCharCode(109+i), functions[i])
+            functionLogicIR(String.fromCharCode(109+i), functions[i])
         }else
         {
-            functionLogics += functionIntLogic("d"+ String.fromCharCode(109+i), functions[i])
+            functionIntLogicIR(String.fromCharCode(109+i), functions[i])
         }
     }
-  
-    contractBody = ""
-    + push("j100")
-    + push("j000")
-    + opcodeMap.get("JUMP")
-    + "d1"
-    + selectorLookups
-    + push("00")
-    + opcodeMap.get("DUP1")
-    + opcodeMap.get("REVERT")
-    + functionLogics
-    + "d0"
-    + push("00")
-    + push("0100000000000000000000000000000000000000000000000000000000")
-    + push("00")
-    + opcodeMap.get("CALLDATALOAD")
-    + opcodeMap.get("DIV")
-    + opcodeMap.get("SWAP1")
-    + opcodeMap.get("POP")
-    + opcodeMap.get("SWAP1")
-    + opcodeMap.get("JUMP")
-    + "dR"
-    + opcodeMap.get("REVERT")
+    addJumpDestination("0")
+    addPush("00")
+    addPush("0100000000000000000000000000000000000000000000000000000000")
+    addPush("00")
+    addOpcode("CALLDATALOAD")
+    addOpcode("DIV")
+    addOpcode("SWAP1")
+    addOpcode("POP")
+    addOpcode("SWAP1")
+    addOpcode("JUMP")
+    addJumpDestination("R")
+    addOpcode("REVERT")
 
+    contractBody = irCodeToBytecode()
     //contractBody = begin + push(functionSelector) + end
     contractBodySize = intToHex(contractBody.length/2)
-  
-    // Setup Jump Destinations
-    for(var i=0; i<contractBody.length; i+=2)
-    {
-      if(contractBody[i]=='j')
-      {
-        for(var j=0; j<contractBody.length; j+=2)
-        {
-          if(contractBody[j]=='d' && contractBody[j+1]==contractBody[i+1])
-          {
-            destinationPosition = intToHex(j/2)
-            if(destinationPosition.length==2)
-                destinationPosition = "00"+destinationPosition
-            contractBody = modifyChar(contractBody, i, destinationPosition[0])
-            contractBody = modifyChar(contractBody, i+1, destinationPosition[1])
-            contractBody = modifyChar(contractBody, i+2, destinationPosition[2])
-            contractBody = modifyChar(contractBody, i+3, destinationPosition[3])
-            break // TODO remove this allow many jumps to one destination
-          }
-        }
-      }
-    }
-
-  
-    // Setup JUMPDEST
-    for(var i=0; i<contractBody.length; i+=2)
-    {
-      if(contractBody[i]=='d')
-      {
-        contractBody = modifyChar(contractBody, i, '5')
-        contractBody = modifyChar(contractBody, i+1, 'B')
-      }
-    }
   
     var abi = '['
     for(let i=0; i<functions.length; i++)

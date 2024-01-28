@@ -43,7 +43,11 @@ function contractHeader(contractSize) {
   {
     offetPlaceholder = "QQ" + offetPlaceholder
   }
-  let constructorBytecode = convertInstructionToBytecode(constructorInstructions)
+
+  irCode = []
+  convertInstructionToBytecodeIR(constructorInstructions)
+
+  let constructorBytecode = irCodeToBytecode()
 
   let returnValue = ""// Constructor
     + constructorBytecode
@@ -96,20 +100,17 @@ function modifyChar(originalString, index, newChar) {
   );
 }
 
-function selectorLookup(signature, destination) {
+function selectorLookupIr(signature, destination) {
   if(destination.length==2)
     destination = destination+"00"
-
-  returnValue =  push(getSelector(signature).substring(0, 8).toUpperCase())
-    + opcodeMap.get("DUP2")
-    + opcodeMap.get("EQ")
-    + push(destination)
-    + opcodeMap.get("JUMPI")
-
-  return returnValue
+  addPush(getSelector(signature).substring(0, 8).toUpperCase())
+  addOpcode("DUP2")
+  addOpcode("EQ")
+  addPushJump(destination)
+  addOpcode("JUMPI")
 }
 
-function functionLogic(jumpLocation, functionData)
+function functionLogicIR(jumpLocation, functionData)
 {
   let functionName = functionData.name
   let parameters = functionData.parameters
@@ -123,21 +124,20 @@ function functionLogic(jumpLocation, functionData)
     literalValue+="0"
   }
 
-  returnValue = jumpLocation
-    + push("20")//start?
-    + push("00")
-    + opcodeMap.get("MSTORE")
-    + push(literalInstructionLength)// length
-    + push("20")
-    + opcodeMap.get("MSTORE")
-    + push(literalValue)
-    + push("40")
-    + opcodeMap.get("MSTORE")
-    + rReturn("00", "60")
-  return returnValue
+  addJumpDestination(jumpLocation)
+  addPush("20")//start?
+  addPush("00")
+  addOpcode("MSTORE")
+  addPush(literalInstructionLength)// length
+  addPush("20")
+  addOpcode("MSTORE")
+  addPush(literalValue)
+  addPush("40")
+  addOpcode("MSTORE")
+  rReturnIR("00", "60")
 }
 
-function functionIntLogic(jumpLocation, functionData)
+function functionIntLogicIR(jumpLocation, functionData)
 {
   let functionName = functionData.name
   let parameters = functionData.parameters
@@ -167,37 +167,33 @@ function functionIntLogic(jumpLocation, functionData)
     labelMap.set(parameters[i].label, {position: intToHex(4 + i*32), size: paramSize, location: "calldata"})
   }
 
-  let returnValue
+  addJumpDestination(jumpLocation)
 
-  returnValue = jumpLocation
-
-  returnValue += convertInstructionToBytecode(instructions)
-
-  return returnValue
+  convertInstructionToBytecodeIR(instructions)
 }
 
-function convertInstructionToBytecode(instructionsParam) {
+function convertInstructionToBytecodeIR(instructionsParam) {
   let returnValue = ""
   for(let i=0; i<instructionsParam.length; i++)
   {
     if(instructionsParam[i].name == "operation")
     {
-      returnValue += operation(instructionsParam[i].lValue, instructionsParam[i].rlValue, instructionsParam[i].operator, instructionsParam[i].rrValue)
+      returnValue += operationIR(instructionsParam[i].lValue, instructionsParam[i].rlValue, instructionsParam[i].operator, instructionsParam[i].rrValue)
     }else if(instructionsParam[i].name == "returnUint")
     {
-      returnValue += returnLiteral(intToHex(parseInt(instructionsParam[i].value)), "20")
+      returnValue += returnLiteralIR(intToHex(parseInt(instructionsParam[i].value)), "20")
     }else if(instructionsParam[i].name == "returnLabel")
     {
-      returnValue += returnLabel(instructionsParam[i].value, intToHex(32))
+      returnValue += returnLabelIR(instructionsParam[i].value, intToHex(32))
     }else if(instructionsParam[i].name == "assignment")
     {
-      returnValue += assignment(instructionsParam[i].lValue, instructionsParam[i].rValue)
+      returnValue += assignmentIR(instructionsParam[i].lValue, instructionsParam[i].rValue)
     }else if(instructionsParam[i].name == "literalAssignment")
     {
-      returnValue += literalAssignment(instructionsParam[i].lValue, intToHex(parseInt(instructionsParam[i].rValue)))
+      returnValue += literalAssignmentIR(instructionsParam[i].lValue, intToHex(parseInt(instructionsParam[i].rValue)))
     }else if(instructionsParam[i].name == "logEvent")
     {
-      returnValue += logEvent(instructionsParam[i].topics)
+      returnValue += logEventIR(instructionsParam[i].topics)
     }else if(instructionsParam[i].name == "declareUint")
     {
       labelMap.set(instructionsParam[i].label[0], {position: intToHex(0), size: 32, location: "memory"})

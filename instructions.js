@@ -89,34 +89,42 @@ function rReturn(offset, size) {
   return returnValue
 }
 
-function returnLiteral(value, size) {
-  let returnValue = push(value) // Return true
-        + storeTopOfStackInMemory("00")
-        + rReturn("00", size)
-  return returnValue
+function codeCopyIR(destOffest, offest, size) {
+  addPush(size)
+  addPush(offset)
+  addPush(destOffest)
+  addOpcode("CODECOPY")
 }
 
-function returnLabel(label, size) {
-  let returnValue = putValueOnStack(label, false/* wtf is this */) // Return true
-        + storeTopOfStackInMemory("00")
-        + rReturn("00", size)
-  return returnValue
+function rReturnIR(offset, size) {
+  addPush(size)
+  addPush(offset)
+  addOpcode("RETURN")
 }
 
-function keccak256(offset, size) {
-  returnValue = push(size)
-    + push(offset)
-    + opcodeMap.get("KECCAK256")
-  return returnValue
+function returnLiteralIR(value, size) {
+  addPush(value)
+  storeTopOfStackInMemoryIR("00")
+  rReturnIR("00", size)
 }
 
-function putLabelOnStack(label, performSizeAdjustement) {
+function returnLabelIR(label, size) {
+  putValueOnStackIR(label, false/* wtf is this */)
+  storeTopOfStackInMemoryIR("00")
+  rReturnIR("00", size)
+}
+
+function keccak256IR(offset, size) {
+  addPush(size)
+  addPush(offset)
+  addOpcode("KECCAK256")
+}
+
+function putLabelOnStackIR(label, performSizeAdjustement) {
   if(label == '👤') {
-    let senderOnTopOfStack = putSenderOnStack()
-    return senderOnTopOfStack
+    putSenderOnStackIR()
+    return
   }
-
-  let returnValue = ""
 
   let size
 
@@ -124,11 +132,11 @@ function putLabelOnStack(label, performSizeAdjustement) {
   {
     let position = labelMap.get(label).position
     size = labelMap.get(label).size
-    returnValue += push(position)
+    addPush(position)
     if(labelMap.get(label).location == "calldata") {
-      returnValue += opcodeMap.get("CALLDATALOAD")
+      addOpcode("CALLDATALOAD")
     } else if(labelMap.get(label).location == "memory") {
-      returnValue += opcodeMap.get("MLOAD")
+      addOpcode("MLOAD")
     } else
     {
       console.log("ERROR: Invalid location, expected calldata or memory")
@@ -137,8 +145,8 @@ function putLabelOnStack(label, performSizeAdjustement) {
   {
     size = 32
     let slot = stateVariables.get(label).position
-    returnValue += push(intToHex(slot))
-      + opcodeMap.get("SLOAD")
+    addPush(intToHex(slot))
+    addOpcode("SLOAD")
   }else
   {
     console.log("Error: Could not find label on the calldata nor state: " + label)
@@ -150,34 +158,25 @@ function putLabelOnStack(label, performSizeAdjustement) {
     for (let i = 0; i < 32-size; i++) {
       sizeAdjustement += "00";
     }
-    returnValue += push(sizeAdjustement)
-      + opcodeMap.get("MUL")
+    addPush(sizeAdjustement)
+    addOpcode("MUL")
   }
-
-  return returnValue
 }
 
-function putSenderOnStack() {
-  
-  let returnValue =  opcodeMap.get("CALLER") // Get my address
-  //+ push("01000000000000000000000000")
-  //+ opcodeMap.get("MUL")
-
-  return returnValue
+function putSenderOnStackIR() {
+  addOpcode("CALLER")
 }
 
-function putMappingValueOnStack(mapLocation, keyLabel, keySize, performSizeAdjustement) {
-  let returnValue = putLabelOnStack(keyLabel, performSizeAdjustement)
-    + storeTopOfStackInMemory("00")
-    + push(mapLocation) // TODO: Need to allow more than 16 mappings
-    + storeTopOfStackInMemory(intToHex(keySize))
-    + keccak256("00", intToHex(keySize + 32))
-    + opcodeMap.get("SLOAD")
-
-  return returnValue
+function putMappingValueOnStackIR(mapLocation, keyLabel, keySize, performSizeAdjustement) {
+  putLabelOnStackIR(keyLabel, performSizeAdjustement)
+  storeTopOfStackInMemoryIR("00")
+  addPush(mapLocation) // TODO: Need to allow more than 16 mappings
+  storeTopOfStackInMemoryIR(intToHex(keySize))
+  keccak256IR("00", intToHex(keySize + 32))
+  addOpcode("SLOAD")
 }
 
-function putLabelValueOnState(label) {
+function putLabelValueOnStateIR(label) {
   let slot = ""
   let location = "state"
   if(stateVariables.has(label))
@@ -191,137 +190,131 @@ function putLabelValueOnState(label) {
   {
     console.log("Error: Could not find label on state while trying to store: " + label)
   }
-  let returnValue = push(intToHex(slot))
+  addPush(intToHex(slot))
   if(location == "state")
   {
-    returnValue += opcodeMap.get("SSTORE")
+    addOpcode("SSTORE")
   }else if(location == "memory")
   {
-    returnValue += opcodeMap.get("MSTORE")
+    addOpcode("MSTORE")
   }
-  return returnValue
 }
 
-function putMappingValueOnState(mapLocation, keyLabel, keySize, performSizeAdjustement) {
-  let returnValue = putLabelOnStack(keyLabel, performSizeAdjustement)
-    + storeTopOfStackInMemory("00")
-    + push(mapLocation) // TODO: Need to allow more than 16 mappings
-    + storeTopOfStackInMemory(intToHex(keySize))
-    + keccak256("00", intToHex(keySize + 32))
-    + opcodeMap.get("SSTORE")
-  return returnValue
+function putMappingValueOnStateIR(mapLocation, keyLabel, keySize, performSizeAdjustement) {
+  putLabelOnStackIR(keyLabel, performSizeAdjustement)
+  storeTopOfStackInMemoryIR("00")
+  addPush(mapLocation) // TODO: Need to allow more than 16 mappings
+  storeTopOfStackInMemoryIR(intToHex(keySize))
+  keccak256IR("00", intToHex(keySize + 32))
+  addOpcode("SSTORE")
 }
 
-function put2dMappingValueOnStack(mapLocation, keyLabelA, keyLabelB, keySize, performSizeAdjustement) {
-  let returnValue = putLabelOnStack(keyLabelA, performSizeAdjustement)
-    + storeTopOfStackInMemory("00")
-    + putLabelOnStack(keyLabelB, performSizeAdjustement)
-    + storeTopOfStackInMemory(intToHex(32))
-    + push(mapLocation)
-    + storeTopOfStackInMemory(intToHex(64))
-    + keccak256("00", intToHex(32 * 3))
-    + opcodeMap.get("SLOAD")
-  return returnValue
+function put2dMappingValueOnStackIR(mapLocation, keyLabelA, keyLabelB, keySize, performSizeAdjustement) {
+  putLabelOnStackIR(keyLabelA, performSizeAdjustement)
+  storeTopOfStackInMemoryIR("00")
+  putLabelOnStackIR(keyLabelB, performSizeAdjustement)
+  storeTopOfStackInMemoryIR(intToHex(32))
+  addPush(mapLocation)
+  storeTopOfStackInMemoryIR(intToHex(64))
+  keccak256IR("00", intToHex(32 * 3))
+  addOpcode("SLOAD")
 }
 
-function put2dMappingValueOnState(mapLocation, keyLabelA, keyLabelB, keySize, performSizeAdjustement) {
-  let returnValue = putLabelOnStack(keyLabelA, performSizeAdjustement)
-    + storeTopOfStackInMemory("00")
-    + putLabelOnStack(keyLabelB, performSizeAdjustement)
-    + storeTopOfStackInMemory(intToHex(32))
-    + push(mapLocation)
-    + storeTopOfStackInMemory(intToHex(64))
-    + keccak256("00", intToHex(32 * 3))
-    + opcodeMap.get("SSTORE")
-  return returnValue
+function put2dMappingValueOnStateIR(mapLocation, keyLabelA, keyLabelB, keySize, performSizeAdjustement) {
+  putLabelOnStackIR(keyLabelA, performSizeAdjustement)
+  storeTopOfStackInMemoryIR("00")
+  putLabelOnStackIR(keyLabelB, performSizeAdjustement)
+  storeTopOfStackInMemoryIR(intToHex(32))
+  addPush(mapLocation)
+  storeTopOfStackInMemoryIR(intToHex(64))
+  keccak256IR("00", intToHex(32 * 3))
+  addOpcode("SSTORE")
 }
 
-function putValueOnStack(label, performSizeAdjustement) {
+function putValueOnStackIR(label, performSizeAdjustement) {
 
   if(label.length == 1)
   {
-    return putLabelOnStack(label[0], performSizeAdjustement)
+    putLabelOnStackIR(label[0], performSizeAdjustement)
+    return
   }else if(label.length == 2)
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
-    return putMappingValueOnStack(mapLocation, label[1], 20, performSizeAdjustement) // currently only address arrays
+    putMappingValueOnStackIR(mapLocation, label[1], 20, performSizeAdjustement) // currently only address arrays
+    return
   }else if(label.length == 3)
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
-    return put2dMappingValueOnStack(mapLocation, label[1], label[2], 20, performSizeAdjustement) // currently only address arrays
+    put2dMappingValueOnStackIR(mapLocation, label[1], label[2], 20, performSizeAdjustement) // currently only address arrays
+    return
   }else{
     console.log("Error: Invalid label length while trying to put it on stack")
   }
 }
 
-function putValueOnState(label, performSizeAdjustement) {
+function putValueOnStateIR(label, performSizeAdjustement) {
 
   if(label.length == 1)
   {
-    return putLabelValueOnState(label[0])
+    putLabelValueOnStateIR(label[0])
+    return
   }else if(label.length == 2)
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
-    return putMappingValueOnState(mapLocation, label[1], 20, performSizeAdjustement) // TODO: Currently on array mappins
+    putMappingValueOnStateIR(mapLocation, label[1], 20, performSizeAdjustement) // TODO: Currently on array mappins
+    return
   }else if(label.length == 3)
   {
     let mapLocation = intToHex(stateVariables.get(label[0]).position)
-    return put2dMappingValueOnState(mapLocation, label[1], label[2], 20, performSizeAdjustement) // TODO: Currently on array mappins
+    put2dMappingValueOnStateIR(mapLocation, label[1], label[2], 20, performSizeAdjustement) // TODO: Currently on array mappins
+    return
   }else{
     console.log("Error: Invalid label length while triying to put it on state")
   }
 }
 
-function storeTopOfStackInMemory(offset) {
-  let returnValue = push(offset)
-    + opcodeMap.get("MSTORE")
-  return returnValue
+function storeTopOfStackInMemoryIR(offset) {
+  addPush(offset)
+  addOpcode("MSTORE")
 }
 
-function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Operator] rrValue
+function operationIR(lValue, rlValue, operator, rrValue) // lValue = rlValue [Operator] rrValue
 {
-  let returnValue = ""
   if(Array.isArray(rrValue)) {
-    returnValue += putValueOnStack(rrValue, false/* wtf is this */)
+    putValueOnStackIR(rrValue, false/* wtf is this */)
   } else {
-    returnValue += push(intToHex(rrValue))
+    addPush(intToHex(rrValue))
   }
-  returnValue += putValueOnStack(rlValue, false/* wtf is this */)
+  putValueOnStackIR(rlValue, false/* wtf is this */)
   if(operator == '➕')
   {
-    returnValue += opcodeMap.get("ADD")
+    addOpcode("ADD")
   }else if(operator == '➖')
   {
-    returnValue += opcodeMap.get("DUP1") // Uint underflow prevention
-    returnValue += opcodeMap.get("DUP3")
-    returnValue += opcodeMap.get("GT")
-    returnValue += push("jR00")
-    returnValue += opcodeMap.get("JUMPI")
-
-    returnValue += opcodeMap.get("SUB")
+    addOpcode("DUP1") // Uint underflow prevention
+    addOpcode("DUP3")
+    addOpcode("GT")
+    addPushJump("R")
+    addOpcode("JUMPI")
+    addOpcode("SUB")
   }
-  returnValue += putValueOnState(lValue, false/* wtf is this */)
-  return returnValue
+  putValueOnStateIR(lValue, false/* wtf is this */)
 }
 
-function assignment(lValue, rValue) // lValue = rValue
+function assignmentIR(lValue, rValue) // lValue = rValue
 {
-  let returnValue = ""
-  returnValue += putValueOnStack(rValue, false/* wtf is this */)
-  returnValue += putValueOnState(lValue, false/* wtf is this */)
-  return returnValue
+  putValueOnStackIR(rValue, false/* wtf is this */)
+  putValueOnStateIR(lValue, false/* wtf is this */)
 }
 
-function literalAssignment(lValue, rValue) // lValue = rValue
+function literalAssignmentIR(lValue, rValue) // lValue = rValue
 {
-  let returnValue = ""
-  returnValue += push(rValue)
-  returnValue += putValueOnState(lValue, false/* wtf is this */)
-  return returnValue
+  addPush(rValue)
+  putValueOnStateIR(lValue, false/* wtf is this */)
 }
 
   // TODO: Implement logs
-function logEvent(topics)
+function logEventIR(topics)
 {
   let eventSignature = getEmojiDescription(topics[0][0]) + getEmojiDescription(topics[0][1])
   eventSignature = functionNameConversor(convertToFunctionName(eventSignature))
@@ -332,28 +325,25 @@ function logEvent(topics)
   let topic2 = topics[2]
   let data = topics[3]
 
-  let returnValue = ""
   if(Array.isArray(data))
-    returnValue += putValueOnStack(data, false)
+    putValueOnStackIR(data, false)
   else
-    returnValue += push(intToHex(parseInt(data)))
+    addPush(intToHex(parseInt(data)))
 
-  returnValue += storeTopOfStackInMemory("00")
+  storeTopOfStackInMemoryIR("00")
 
   if(Array.isArray(topic2))
-    returnValue += putValueOnStack(topic2, false)
+    putValueOnStackIR(topic2, false)
   else
-    returnValue += push(intToHex(parseInt(topic2)))
+    addPush(intToHex(parseInt(topic2)))
 
   if(Array.isArray(topic1))
-    returnValue += putValueOnStack(topic1, false)
+    putValueOnStackIR(topic1, false)
   else
-    returnValue += push(intToHex(parseInt(topic1)))
+    addPush(intToHex(parseInt(topic1)))
 
-  returnValue += push(topic0)
-    + push(intToHex(32))
-    + push("00")
-    + opcodeMap.get("LOG3")
-
-  return returnValue
+  addPush(topic0)
+  addPush(intToHex(32))
+  addPush("00")
+  addOpcode("LOG3")
 }
