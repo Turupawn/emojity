@@ -1,12 +1,26 @@
-## Web3 Template
+# Emoji EVM Language
 
-### Run
+A language to build smart contracts compatible with the Ethereum Virtual Machine using only emojis.
 
-`lite-server`
+## 🛠 Compile a contract
 
+You can generate
+```
+npm i -g lite-server
+lite-server
+```
 
-## Deploy
+## Deploy a contract
+
+Install foundry first.
 
 ```
-cast send --legacy --rpc-url https://sepolia-rpc.scroll.io/ --private-key YOURPRIVATEKEY --create YOURBYTECODE
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
+Then you can deploy using the `cast` command.
+
+```
+cast send --legacy --rpc-url YOURRPCURL --private-key YOURPRIVATEKEY --create YOURBYTECODE
 ```
