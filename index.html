@@ -23,7 +23,10 @@
   ↩️🍊
 🔚</textarea></br>
   <div id="emoji_picker"></div>
-  <input type="button" value="🛠" onclick="_compile()"></input></br>
+  <input type="button" value="🛠" onclick="_compile()"></input>
+  <input type="button" value="🚀" onclick="_deploy()"></input></br>
+  <h2>#️⃣</h2>
+  <textarea rows="1" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_contractAddress"></textarea></br>
   <h2>🔢</h2>
   <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_bytecode"></textarea></br>
   <h2>📑</h2>
@@ -60,5 +63,12 @@
       });
     }
     compile(unicodeCodePoints)
+  }
+
+  function _deploy()
+  {
+    var bytecode = document.getElementById("_bytecode").value;
+    var abi = document.getElementById("_abi").value;
+    deploy(abi, bytecode)
   }
 </script>
