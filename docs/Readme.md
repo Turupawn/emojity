@@ -135,8 +135,8 @@ The costructor code will be executed only once, when the contract is deployed.
 ```
 👷
 🏁
-  💰👤📥1️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣
-  📑🪙🚚📑0️⃣📑👤📑1️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣
+  🍇📥1️⃣
+  🍓📥2️⃣
 🔚
 ```
 
@@ -145,9 +145,11 @@ The costructor code will be executed only once, when the contract is deployed.
 Functions are the executable units of code.
 
 ```
-🪙🥧👀↩️🔢8️⃣
+🍊➕👀🔢🍇🔢🍓↩️🔢
 🏁
-  ↩️1️⃣8️⃣
+  🔢🍊
+  🍊📥🍇➕🍓
+  ↩️🍊
 🔚
 ```
 
@@ -183,13 +185,36 @@ NAME VISIBILITY PARAMS ↩️ RETURN_TYPE
 ## Instructions
 
 ## Return
-↩️ VALUE
 
-## Store
-VARIABLE 📥 VALUE
+Finishes function execution and returns a vaule.
 
-## Load
-VARIABLE 📤 VALUE
+```
+↩️🍊
+```
+
+## Assign
+
+Assign a value to another.
+
+```
+🍓📥🍊
+```
+
+## Addition
+
+Sum two values and store it on a variable.
+
+```
+🍊📥🍇➕🍓
+```
+
+## Subtraction
+
+Make a subtraction and store it on a variable.
+
+```
+🍊📥🍇➖🍓
+```
 
 ## Condition
 ❓VARIABLE
@@ -199,17 +224,3 @@ VARIABLE 📤 VALUE
 
 ## Revert
 ❌
-
-## Addition
-VALUE ➕ VALUE
-
-## Subtraction
-VALUE ➖ VALUE
-
-## Greather_THAN
-VALUE ⬆️ VALUE
-
-## LESS_THAN
-VALUE ⬇️ VALUE
-
-
