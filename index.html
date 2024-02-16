@@ -22,7 +22,11 @@
   🍊📥🍇➖🍓
   ↩️🍊
 🔚</textarea></br>
-  <input type="button" value="🛠" onclick="_compile()"></input></br>
+  <div id="emoji_picker"></div>
+  <input type="button" value="🛠" onclick="_compile()"></input>
+  <input type="button" value="🚀" onclick="_deploy()"></input></br>
+  <h2>#️⃣</h2>
+  <textarea rows="1" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_contractAddress"></textarea></br>
   <h2>🔢</h2>
   <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_bytecode"></textarea></br>
   <h2>📑</h2>
@@ -30,18 +34,23 @@
   <h2>🏗️</h2>
   <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_solidityInterface"></textarea></br>
   <br>
+  <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.5/web3.min.js"></script>
-  <script type="text/javascript" src="opcodes.js"></script>
-  <script type="text/javascript" src="instructions.js"></script>
-  <script type="text/javascript" src="emojiLib.js"></script>
-  <script type="text/javascript" src="evmLib.js"></script>
-  <script type="text/javascript" src="compilerLib.js"></script>
+  <script type="text/javascript" src="lib/emoji/emoji.js"></script>
+  <script type="text/javascript" src="lib/evm/evm.js"></script>
+  <script type="text/javascript" src="lib/evm/instructions.js"></script>
+  <script type="text/javascript" src="lib/compiler/irCode.js"></script>
+  <script type="text/javascript" src="lib/compiler/compiler.js"></script>
+  <script type="text/javascript" src="lib/compiler/parser.js"></script>
+  <script type="text/javascript" src="lib/compiler/utils.js"></script>
   <script defer src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
 </body>
 </html>
 
 <script>
   loadEmojiLib()
+  loadOpcodeLib()
+
   function _compile()
   {
     var container = document.getElementById("_code").value;
@@ -54,5 +63,12 @@
       });
     }
     compile(unicodeCodePoints)
+  }
+
+  function _deploy()
+  {
+    var bytecode = document.getElementById("_bytecode").value;
+    var abi = document.getElementById("_abi").value;
+    deploy(abi, bytecode)
   }
 </script>
