@@ -214,6 +214,15 @@ VARIABLE 📥 VALUE
 🔚
 ```
 
+## Loop
+
+```
+🔄VARIABLE
+🏁
+  INSTRUCTIONS
+🔚
+```
+
 ## Addition
 
 ```
