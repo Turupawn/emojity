@@ -195,17 +195,63 @@ NAME VISIBILITY PARAMS ↩️ RETURN_TYPE
 
 ## Return
 
+Gracefully stops the function execution and returns a value.
+
 ```
 ↩️ VALUE
 ```
 
+Example:
+
+```
+↩️🍓
+```
+
 ## Assignment
+
+Assigns a value to a variable. Notice function parameters are not assignable.
 
 ```
 VARIABLE 📥 VALUE
 ```
 
+Example:
+
+```
+🍓📥🍇
+```
+
+## Addition
+
+Sums two values and assign the result to a variable.
+
+```
+VARIABLE 📥 VALUE ➕ VALUE
+```
+
+Example:
+
+```
+🍓📥🍇➕🍊
+```
+
+## Subtraction
+
+Subtracts a value to another and assign the result to a variable.
+
+```
+VARIABLE 📥 VALUE ➖ VALUE
+```
+
+Example:
+
+```
+🍓📥🍇➖🍊
+```
+
 ## If Statement
+
+Executes a set of instructions if a variable value is different than 0.
 
 ```
 ❓VARIABLE
@@ -214,7 +260,18 @@ VARIABLE 📥 VALUE
 🔚
 ```
 
+Example:
+
+```
+❓🍓
+🏁
+  🍓📥🍇
+🔚
+```
+
 ## Loop
+
+Executes repeatedly a set of instructions as long as a variable value is different than 0.
 
 ```
 🔄VARIABLE
@@ -223,26 +280,23 @@ VARIABLE 📥 VALUE
 🔚
 ```
 
-## Addition
+Example:
 
 ```
-VARIABLE 📥 VALUE ➕ VALUE
-```
-
-## Subtraction
-
-```
-VARIABLE 📥 VALUE ➖ VALUE
+🔄🍓
+🏁
+  🍓📥🍓➖1️⃣
+  🍇📥🍇➕5️⃣
+🔚
 ```
 
 ## Logs (Events)
 
+Logs an event to the blockchain. Notice the name is a 2 emoji signature. Up to 4 topics are supported.
+
 ```
 📑 NAME 📑 TOPIC1 📑 TOPIC2 📑 TOPIC3
 ```
-
-* Name is a 2 emoji signature
-* Up to 4 topics allowed
 
 Example:
 ```
