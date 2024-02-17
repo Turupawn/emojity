@@ -205,19 +205,13 @@ NAME VISIBILITY PARAMS ↩️ RETURN_TYPE
 VARIABLE 📥 VALUE
 ```
 
-## Condition
+## If Statement
 
 ```
 ❓VARIABLE
 🏁
   INSTRUCTIONS
 🔚
-```
-
-## Revert
-
-```
-❌
 ```
 
 ## Addition
