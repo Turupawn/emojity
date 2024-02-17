@@ -234,3 +234,17 @@ VARIABLE 📥 VALUE ➕ VALUE
 ```
 VARIABLE 📥 VALUE ➖ VALUE
 ```
+
+## Logs (Events)
+
+```
+📑 NAME 📑 TOPIC1 📑 TOPIC2 📑 TOPIC3
+```
+
+* Name is a 2 emoji signature
+* Up to 4 topics allowed
+
+Example:
+```
+📑🪙🚚📑👤📑🍓📑🍇
+```
