@@ -1,4 +1,4 @@
-# Emojidity
+# emojidity
 
 The Emoji language for the Ethereum Virtual Machine.
 
