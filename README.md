@@ -1,6 +1,6 @@
-# Emoji EVM Language
+# emojidity
 
-The emoji language for the Ethereum Virtual Machine.
+The Emoji language for the Ethereum Virtual Machine.
 
 ## Run the web compiler
 
