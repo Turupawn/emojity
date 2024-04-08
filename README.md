@@ -50,6 +50,34 @@ lite-server
 🔚
 ```
 
+### Staking
+
+```
+0️⃣🤗0️⃣
+
+🗺️🍇
+
+🍇🔼📢↩️🔢
+🏁
+  🍇👤📥🍇👤➕💰
+  ↩️1️⃣
+🔚
+
+🍇🔽📢↩️🔢
+🏁
+  🔢🍓
+  🍓📥🍇👤
+  🍇👤📥0️⃣
+  📡👤📍0️⃣💸🍓⛽0️⃣
+  ↩️1️⃣
+🔚
+
+🍇❓👀#️⃣🍓↩️🔢
+🏁
+  ↩️🍇🍓
+🔚
+```
+
 ### ERC20 Token
 
 ```
@@ -339,7 +367,7 @@ Example:
 
 ## External calls
 
-Makes a call to an external account. Use this to call a function to an extneral smart contract or to send eth.
+Makes a call to an external account. Use this to call a function to an external smart contract or to send eth.
 
 ```
 📡 EXTERNAL_ACCOUNT_ADDRESS 📍 SELECTOR 💸 ETHER_SENT ⛽ MAXIMUM_GAS_USED
