@@ -336,3 +336,17 @@ Example:
 ```
 📑🪙🚚📑👤📑🍓📑🍇
 ```
+
+## External calls
+
+Makes a call to an external account. Use this to call a function to an extneral smart contract or to send eth.
+
+```
+📡 EXTERNAL_ACCOUNT_ADDRESS 📍 SELECTOR 💸 ETHER_SENT ⛽ MAXIMUM_GAS_USED
+```
+
+
+Example:
+```
+📡👤📍0️⃣💸🍓⛽0️⃣
+```
