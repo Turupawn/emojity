@@ -283,12 +283,12 @@ Example:
 🍓📥🍇
 ```
 
-## Addition
+## Arithmetic Operators
 
-Sums two values and assign the result to a variable.
+Perform an airthmetic operation between two values.
 
 ```
-VARIABLE 📥 VALUE ➕ VALUE
+VARIABLE 📥 VALUE OPERATOR VALUE
 ```
 
 Example:
@@ -297,19 +297,35 @@ Example:
 🍓📥🍇➕🍊
 ```
 
-## Subtraction
+### Supported Arithmetic Operators
 
-Subtracts a value to another and assign the result to a variable.
+| Operator | Operation |
+|-------|------|
+| ➕ | Addition |
+| ➖ | Subtraction |
+| ✖️ | Multiplication |
+| ➗ | Division |
+
+## Boolean Operators
+
+Perform an airthmetic operation between two values. Returns 1️⃣ if true, otherwhise returns 0️⃣.
 
 ```
-VARIABLE 📥 VALUE ➖ VALUE
+VARIABLE 📥 VALUE OPERATOR VALUE
 ```
 
 Example:
 
 ```
-🍓📥🍇➖🍊
+🍓📥🍇⬆️🍊
 ```
+
+### Supported Boolean Operators
+
+| Operator | Operation |
+|-------|------|
+| ⬆️ | Greater than |
+| ⬇️ | Less than |
 
 ## If Statement
 
