@@ -1,4 +1,4 @@
-# emojidity
+# emojity
 
 The Emoji language for the Ethereum Virtual Machine.
 
@@ -9,7 +9,7 @@ npm i -g lite-server
 lite-server
 ```
 
-## Emojidity by Example
+## Emojity by Example
 
 ### Counter Contract
 
