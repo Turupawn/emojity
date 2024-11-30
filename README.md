@@ -474,3 +474,36 @@ Example:
 ```
 📡👤📍0️⃣💸🍓⛽0️⃣
 ```
+
+# Sonatina support progress
+
+The integration of the Sonatina backend into Emojity is in progress. This is expected to improve security, reduce workload, and support testing new technologies. Below is an update on the current migration progress:
+
+## Instructions
+
+| Instruction | Supported |
+|-------------|---------- |
+| Operation | 🟨 |
+| Return Literal | 🟥 |
+| Return Label | 🟨 |
+| Assignment | 🟥 |
+| Literal Assignment | 🟥 |
+| Log Event | 🟥 |
+| If Statement | 🟨 |
+| While Loop | 🟥 |
+| Memory declarations | 🟥 |
+| External Call | 🟥 |
+| Revert | 🟥 |
+
+## Others
+
+| Type | Supported |
+|------|---------- |
+| Calldata variables | 🟨 |
+| Memory variables | 🟥 |
+| State variables | 🟥 |
+| Mappings | 🟥 |
+| Constructor | 🟥 |
+| `CALLER` opcode 0x33 | 🟥 |
+| `ADDRESS` opcode 0x30 | 🟥 |
+| `CALLVALUE` opcode 0x34 | 🟥 |
