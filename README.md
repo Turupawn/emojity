@@ -484,7 +484,7 @@ The integration of the Sonatina backend into Emojity is in progress. This is exp
 | Instruction | Supported |
 |-------------|---------- |
 | Operation | 🟨 |
-| Return Literal | 🟥 |
+| Return Literal | 🟨 |
 | Return Label | 🟨 |
 | Assignment | 🟥 |
 | Literal Assignment | 🟥 |
