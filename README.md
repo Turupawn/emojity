@@ -461,6 +461,14 @@ Example:
 📑🪙🚚📑👤📑🍓📑🍇
 ```
 
+## Revert
+
+Halts computation and reverts all changes to the global state.
+
+```
+❌
+```
+
 ## External calls
 
 Makes a call to an external account. Use this to call a function to an external smart contract or to send eth.
@@ -493,7 +501,7 @@ The integration of the Sonatina backend into Emojity is in progress. This is exp
 | While Loop | 🟥 |
 | Memory declarations | 🟥 |
 | External Call | 🟥 |
-| Revert | 🟥 |
+| Revert | 🟨 |
 
 ## Others
 
@@ -501,7 +509,7 @@ The integration of the Sonatina backend into Emojity is in progress. This is exp
 |------|---------- |
 | Calldata variables | 🟨 |
 | Memory variables | 🟥 |
-| State variables | 🟥 |
+| State variables | 🟨 |
 | Mappings | 🟥 |
 | Constructor | 🟥 |
 | `CALLER` opcode 0x33 | 🟥 |
