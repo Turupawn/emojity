@@ -9,7 +9,7 @@
   <p id="web3_message" style="display: none"></p>
   <p id="contract_state" style="display: none"></p>
   <h2>📝</h2>
-  <textarea value="" rows="10" cols="80" id="_code">0️⃣🤗0️⃣
+  <textarea value="" rows="10" cols="80" id="_code">1️⃣🤗0️⃣
 
 🔢🍎
 
@@ -29,9 +29,10 @@
   <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_bytecode"></textarea></br>
   <h2>📑</h2>
   <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_abi"></textarea></br>
+  <h2>🗂️</h2>
+  <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_jsonMetadata"></textarea></br>
   <h2>🏗️</h2>
   <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_solidityInterface"></textarea></br>
-  <br>
   <h2>🎼</h2>
   <textarea rows="4" cols="50" disabled style="background-color: #f0f0f0; opacity: 0.8; cursor: not-allowed;" type="text"  value="" id="_sonatina"></textarea></br>
   <br>
@@ -57,16 +58,8 @@
 
   function _compile()
   {
-    var container = document.getElementById("_code").value;
-    var unicodeCodePoints = [];
-    container = container.replace(/\n/g, "🛑")
-    if (container) {
-      // Parse the container using twemoji
-      twemoji.parse(container, function(icon, options, variant) {
-        unicodeCodePoints.push(icon);
-      });
-    }
-    compile(unicodeCodePoints)
+    var code = document.getElementById("_code").value;
+    compile(code)
   }
 
   function _deploy()
