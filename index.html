@@ -56,10 +56,15 @@
   loadEmojiLib()
   loadOpcodeLib()
 
-  function _compile()
+  async function _compile()
   {
     var code = document.getElementById("_code").value;
-    compile(code)
+    let result = await compile(code)
+    document.getElementById("_bytecode").value = result.bytecode
+    document.getElementById("_abi").value = result.abi
+    document.getElementById("_jsonMetadata").value = result.metadata
+    document.getElementById("_solidityInterface").value = result.solidityInterface
+    document.getElementById("_sonatina").value = result.sonatina
   }
 
   function _deploy()

@@ -1,0 +1,13 @@
+{
+    "name": "emojity-compiler",
+    "version": "1.0.0",
+    "description": "Compiler for Emojity smart contracts",
+    "main": "lib/compiler/compiler.js",
+    "types": "lib/compiler/compiler.d.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": ["ethereum", "compiler", "emojity"],
+    "author": "Your Name",
+    "license": "MIT"
+}
