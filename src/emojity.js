@@ -1,16 +1,19 @@
 // Create a promise that resolves when all scripts are loaded
 const loadScripts = new Promise((resolve) => {
     const scripts = [
-        "lib/emoji/emoji.js",
-        "lib/evm/evm.js",
-        "lib/evm/instructions.js",
-        "lib/evm/memory.js",
-        "lib/compiler/irCode.js",
-        "lib/compiler/compiler.js",
-        "lib/compiler/parser.js",
-        "lib/compiler/utils.js",
-        "lib/compiler/sonatina.js",
-        "lib/emoji/twemoji.min.js"
+        "src/lib/emoji-mart@latest_dist_browser.js",
+        "src/lib/js-sha3@0.8.0_build_sha3.min.js.js",
+        "src/lib/web3_1.3.5_web3.min.js",
+        "src/lib/twemoji.min.js",
+        "src/emoji/emoji.js",
+        "src/evm/evm.js",
+        "src/evm/instructions.js",
+        "src/evm/memory.js",
+        "src/compiler/irCode.js",
+        "src/compiler/compiler.js",
+        "src/compiler/parser.js",
+        "src/compiler/utils.js",
+        "src/compiler/sonatina.js",
     ];
 
     let loaded = 0;
