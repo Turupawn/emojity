@@ -41,14 +41,31 @@
 </html>
 
 <script>
+  let emojityCompiler;
+
+  // Initialize emojity when the script loads
+  window.emojity.then(instance => {
+    emojityCompiler = instance;
+  }).catch(console.error);
+
   async function _compile() {
-    var code = document.getElementById("_code").value;
-    let result = await emojity.compile(code)
-    document.getElementById("_bytecode").value = result.bytecode
-    document.getElementById("_abi").value = result.abi
-    document.getElementById("_jsonMetadata").value = result.metadata
-    document.getElementById("_solidityInterface").value = result.solidityInterface
-    document.getElementById("_sonatina").value = result.sonatina
+    try {
+      if (!emojityCompiler) {
+        emojityCompiler = await window.emojity;
+      }
+
+      var code = document.getElementById("_code").value;
+      let result = await emojityCompiler.compile(code);
+      
+      document.getElementById("_bytecode").value = result.bytecode;
+      document.getElementById("_abi").value = result.abi;
+      document.getElementById("_jsonMetadata").value = result.metadata;
+      document.getElementById("_solidityInterface").value = result.solidityInterface;
+      document.getElementById("_sonatina").value = result.sonatina;
+    } catch (error) {
+      console.error('Compilation failed:', error);
+      alert('Compilation failed: ' + error.message);
+    }
   }
 
   function _deploy()

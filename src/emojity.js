@@ -1,5 +1,32 @@
-// Create a promise that resolves when all scripts are loaded
+// Helper to check if we're in browser environment
+const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+
+// Modified script loading logic
 const loadScripts = new Promise((resolve) => {
+    if (!isBrowser) {
+        // In Node.js environment, require the files directly
+        try {
+            require('./lib/emoji-mart@latest_dist_browser.js');
+            require('./lib/js-sha3@0.8.0_build_sha3.min.js.js');
+            require('./lib/web3_1.3.5_web3.min.js');
+            require('./lib/twemoji.min.js');
+            require('./emoji/emoji.js');
+            require('./evm/evm.js');
+            require('./evm/instructions.js');
+            require('./evm/memory.js');
+            require('./compiler/irCode.js');
+            require('./compiler/compiler.js');
+            require('./compiler/parser.js');
+            require('./compiler/utils.js');
+            require('./compiler/sonatina.js');
+            resolve();
+        } catch (error) {
+            console.error('Error loading Node.js dependencies:', error);
+            throw error;
+        }
+        return;
+    }
+
     const scripts = [
         "src/lib/emoji-mart@latest_dist_browser.js",
         "src/lib/js-sha3@0.8.0_build_sha3.min.js.js",
@@ -30,29 +57,29 @@ const loadScripts = new Promise((resolve) => {
     });
 });
 
-// Wait for scripts to load before initializing
-loadScripts.then(() => {
-    (function(root, factory) {
-        if (typeof define === 'function' && define.amd) {
-            // AMD
-            define([], factory);
-        } else if (typeof module === 'object' && module.exports) {
-            // Node
-            module.exports = factory();
-        } else {
-            // Browser
-            root.emojity = factory();
-        }
-    }(typeof self !== 'undefined' ? self : this, function() {
-        // Initialize required libraries
-        loadEmojiLib();
-        loadOpcodeLib();
+// Initialize function
+const initialize = () => {
+    return new Promise((resolve) => {
+        loadScripts.then(() => {
+            if (typeof loadEmojiLib === 'function') loadEmojiLib();
+            if (typeof loadOpcodeLib === 'function') loadOpcodeLib();
+            resolve({
+                compile: compile,
+                loadEmojiLib: loadEmojiLib,
+                loadOpcodeLib: loadOpcodeLib
+            });
+        });
+    });
+};
 
-        // Return the public API
-        return {
-            compile: compile,
-            loadEmojiLib: loadEmojiLib,
-            loadOpcodeLib: loadOpcodeLib
-        };
-    }));
-}); 
+// Export for different environments
+if (typeof define === 'function' && define.amd) {
+    // AMD
+    define([], () => initialize());
+} else if (typeof module === 'object' && module.exports) {
+    // Node
+    module.exports = initialize();
+} else if (isBrowser) {
+    // Browser
+    window.emojity = initialize();
+} 
