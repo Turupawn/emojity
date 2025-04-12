@@ -1,7 +1,35 @@
 if (typeof window == 'undefined') {
-  const { getFunction, getFunctionsLength, getStateVariable, getStateVariablesEntries, parseConstructor } = require('./parser');
-  const { getSelector, functionNameConversor } = require('./utils');
-  const { getConstructorInstructions } = require('../globals/globals');
+  const { initMemory } = require('../evm/memory.js');
+  const { parseNumber, parseConstructor, parseStateVariable, parseFunction } = require('./parser.js');
+  const { toEmoji, getEmojiDescription, loadEmojiLib } = require('../emoji/emoji.js');
+  const {
+    getCurrentToken,
+    advanceToken,
+    resetCurrentToken,
+    getCurrentJumpDestination,
+    addvanceCurrentJumpDestination,
+    resetCurrentJumpDestination,
+    setTokens,
+    getTokensLength,
+    getToken,
+    resetFunctions,
+    getFunctionsLength,
+    getFunction,
+    resetStateVariables,
+    resetLocalVariables,
+    resetConstructorInstructions,
+    getRevertDestination,
+    setRevertDestination,
+    getStateVariable,
+    getConstructorInstructions,
+    getStateVariablesEntries,
+    hasStateVariable,
+  } = require('../globals/globals.js')
+
+  const { addPushJump, addOpcode, addJumpDestination, addPush } = require('./irCode.js');
+  const { getFunctionSignature } = require('./utils.js');
+  const { selectorLookupIr, functionLogic, getSelector } = require('../evm/evm.js');
+  const { prepareCompilation, parse } = require('./compiler.js');
 }
 
 var blocks = new Map()

@@ -1,7 +1,20 @@
 if (typeof window == 'undefined') {
-  const { getCurrentToken, advanceToken, regressToken } = require('../globals/globals');
-  const { getEmojiDescription } = require('../emoji/emoji');
-  const { functionNameConversor } = require('./utils');
+    const {
+        getCurrentToken,
+        advanceToken,
+        regressToken,
+        getTokensLength,
+        getToken,
+        addFunction,
+        addStateVariable,
+        getStateVariablesSize,
+        setConstructorInstructions,
+        getStateVariable,
+      } = require('../globals/globals');
+      const { functionNameConversor, convertToFunctionName } = require('./utils');
+    
+    
+      const { toEmoji, getEmojiDescription, loadEmojiLib } = require('../emoji/emoji.js');
 }
 
 function parseNumber()
@@ -528,14 +541,14 @@ function parseConstructor() {
 }
 
 if (typeof window == 'undefined') {
-  module.exports = {
-    parseNumber,
-    parseUint,
-    parseParameter,
-    parseInstructions,
-    parseFunction,
-    parseVariable,
-    parseStateVariable,
-    parseConstructor
-  };
+    module.exports = {
+        parseNumber,
+        parseUint,
+        parseParameter,
+        parseInstructions,
+        parseFunction,
+        parseVariable,
+        parseStateVariable,
+        parseConstructor
+    };
 }

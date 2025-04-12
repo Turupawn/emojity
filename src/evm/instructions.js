@@ -1,7 +1,9 @@
 if (typeof window == 'undefined') {
   const { getSelector } = require('./evm');
   const { allocateMemory } = require('./memory');
-  const { getLocalVariable, hasLocalVariable } = require('../globals/globals');
+  const { getLocalVariable, hasLocalVariable, hasStateVariable, getStateVariable } = require('../globals/globals');
+  const { addPushJump, addOpcode, addJumpDestination, irCodeToBytecode, addPush } = require('../compiler/irCode');
+  const { selectorLookupIr, functionLogic, intToHex } = require('../evm/evm.js');
 }
 
 function push(value) {
@@ -586,20 +588,20 @@ function whileLoop(condition, instructionsParam) {
 
 if (typeof window == 'undefined') {
   module.exports = {
-      push,
-      codeCopy,
-      rReturn,
-      returnLiteral,
-      returnStringLiteral,
-      rkeccak256,
-      putLabelOnStack,
-      putValueOnStack,
-      putValueOnState,
-      operation,
-      assignment,
-      literalAssignment,
-      logEvent,
-      ifStatement,
-      whileLoop
-  };
+    push,
+    codeCopy,
+    rReturn,
+    returnLiteral,
+    returnStringLiteral,
+    rkeccak256,
+    putLabelOnStack,
+    putValueOnStack,
+    putValueOnState,
+    operation,
+    assignment,
+    literalAssignment,
+    logEvent,
+    ifStatement,
+    whileLoop
+};
 }

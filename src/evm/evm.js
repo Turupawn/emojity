@@ -1,7 +1,50 @@
 if (typeof window == 'undefined') {
   const Web3 = require('web3');
   const { keccak256 } = require('../lib/js-sha3@0.8.0_build_sha3.min.js');
-  const { irCodeToBytecode } = require('../compiler/irCode');
+  const { addPushJump, addOpcode, addJumpDestination, irCodeToBytecode, addPush, addBytecode } = require('../compiler/irCode');
+  const { initMemory, allocateMemory } = require('../evm/memory.js');
+
+
+  const {
+    getCurrentToken,
+    advanceToken,
+    resetCurrentToken,
+    getCurrentJumpDestination,
+    addvanceCurrentJumpDestination,
+    resetCurrentJumpDestination,
+    setTokens,
+    getTokensLength,
+    getToken,
+    resetFunctions,
+    getFunctionsLength,
+    getFunction,
+    resetStateVariables,
+    resetLocalVariables,
+    resetConstructorInstructions,
+    getRevertDestination,
+    setRevertDestination,
+    setLocalVariables,
+    getConstructorInstructions,
+  } = require('../globals/globals.js')
+
+
+  const {
+    push,
+    codeCopy,
+    rReturn,
+    returnLiteral,
+    returnStringLiteral,
+    rkeccak256,
+    putLabelOnStack,
+    putValueOnStack,
+    putValueOnState,
+    operation,
+    assignment,
+    literalAssignment,
+    logEvent,
+    ifStatement,
+    whileLoop
+  } = require('./instructions.js')
 }
 var accounts
 var web3
@@ -320,6 +363,7 @@ if (typeof window == 'undefined') {
       selectorLookupIr,
       functionLogic,
       utilityPushValue,
-      convertInstructionToBytecode
+      convertInstructionToBytecode,
+      intToHex
   };
 }

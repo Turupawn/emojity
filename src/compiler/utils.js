@@ -1,5 +1,5 @@
 if (typeof window == 'undefined') {
-  const { keccak256 } = require('../lib/js-sha3@0.8.0_build_sha3.min.js');
+    const { keccak256 } = require('../lib/js-sha3@0.8.0_build_sha3.min.js');
 }
 
 function erc20NameConversor(functionName)
@@ -100,12 +100,11 @@ function convertToFunctionName(name) {
 }
 
 if (typeof window == 'undefined') {
-  module.exports = {
-    erc20NameConversor,
-    erc721NameConversor,
-    functionNameConversor,
-    getFunctionSignature,
-    convertToFunctionName,
-    getSelector
-  };
+    module.exports = {
+        erc20NameConversor,
+        erc721NameConversor,
+        functionNameConversor,
+        getFunctionSignature,
+        convertToFunctionName,
+    };
 }

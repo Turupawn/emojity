@@ -24,8 +24,8 @@ function freeMemory()
 
 if (typeof window == 'undefined') {
   module.exports = {
-      initMemory,
-      allocateMemory,
-      freeMemory
-  };
+    initMemory,
+    allocateMemory,
+    freeMemory
+};
 }

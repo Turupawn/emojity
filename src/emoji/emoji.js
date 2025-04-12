@@ -122,10 +122,5 @@ function getEmojiDescription(emojiCode) {
 }
 
 if (typeof window == 'undefined') {
-  module.exports = {
-      loadEmojiLib,
-      getEmojiDescription,
-      toEmoji,
-      onEmojiClicked
-  };
+  //export { loadEmojiLib, getEmojiDescription, toEmoji, onEmojiClicked };
 }

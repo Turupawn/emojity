@@ -1,4 +1,7 @@
-var irCode = []
+if (typeof window == 'undefined') {
+    const { selectorLookupIr, functionLogic, intToHex } = require('../evm/evm.js');
+    const { push } = require('../evm/instructions.js');
+}
 
 function addPushJump(value) {
     irCode.push({type: "pushJump", value: value, byteSize: 3})
@@ -77,12 +80,12 @@ function irCodeToBytecode() {
 }
 
 if (typeof window == 'undefined') {
-  module.exports = {
-    addPushJump,
-    addOpcode,
-    addJumpDestination,
-    addBytecode,
-    addPush,
-    irCodeToBytecode
-  };
+    module.exports = {
+        addPushJump,
+        addOpcode,
+        addJumpDestination,
+        addBytecode,
+        addPush,
+        irCodeToBytecode
+    };
 }

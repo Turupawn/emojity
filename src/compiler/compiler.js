@@ -1,22 +1,34 @@
 if (typeof window == 'undefined') {
   const { initMemory } = require('../evm/memory.js');
-  const { parseNumber, parseConstructor } = require('./parser.js');
+  const { parseNumber, parseConstructor, parseStateVariable, parseFunction } = require('./parser.js');
   const { toEmoji, getEmojiDescription, loadEmojiLib } = require('../emoji/emoji.js');
   const {
-    resetStateVariables,
-    resetLocalVariables,
-    resetConstructorInstructions,
     getCurrentToken,
-    getTokensLength,
-    getToken,
     advanceToken,
     resetCurrentToken,
     getCurrentJumpDestination,
     addvanceCurrentJumpDestination,
+    resetCurrentJumpDestination,
     setTokens,
+    getTokensLength,
+    getToken,
     resetFunctions,
     getFunctionsLength,
-  } = require('./globals.js')
+    getFunction,
+    resetStateVariables,
+    resetLocalVariables,
+    resetConstructorInstructions,
+    getRevertDestination,
+    setRevertDestination,
+  } = require('../globals/globals.js')
+
+  const { addPushJump, addOpcode, addJumpDestination, addPush, irCodeToBytecode } = require('./irCode.js');
+  const { getFunctionSignature } = require('./utils.js');
+  const { selectorLookupIr, functionLogic, intToHex, contractHeader } = require('../evm/evm.js');
+
+  const { compileToSonatina } = require('./sonatina.js');
+
+  const { keccak256 } = require('../lib/js-sha3@0.8.0_build_sha3.min.js');
 }
 
 const MAYOR_VERSION = 1
@@ -275,3 +287,5 @@ const deploy = async (abi, bytecode) => {
 if (typeof window == 'undefined') {
   module.exports = { compile };
 }
+
+module.exports = { compile, nextToken, prepareCompilation, parse };
