@@ -1,7 +1,6 @@
 const MAYOR_VERSION = 1
 const MINOR_VERSION = 0
 
-var currentToken
 var currentJumpDestination
 var tokens
 var functions
@@ -13,9 +12,9 @@ var revertDestination
 function nextToken()
 {
     do {
-        currentToken+=1
-    }while(currentToken<tokens.length
-        && toEmoji(tokens[currentToken]) == '🛑')
+        advanceToken()
+    }while(getCurrentToken()<tokens.length
+        && toEmoji(tokens[getCurrentToken()]) == '🛑')
 }
 
 function nextJumpDestination()
@@ -24,7 +23,7 @@ function nextJumpDestination()
 }
 
 function prepareCompilation(unicodeCodePoints) {
-  currentToken = 0
+  resetCurrentToken()
   currentJumpDestination = 0
   initMemory()
   tokens = unicodeCodePoints
@@ -32,7 +31,7 @@ function prepareCompilation(unicodeCodePoints) {
   stateVariables = new Map()
 
   let mayorVersion = parseInt(parseNumber())
-  let parser = tokens[currentToken]
+  let parser = tokens[getCurrentToken()]
   nextToken()
   let minorVersion = parseInt(parseNumber())
 
@@ -234,7 +233,6 @@ const compile = async (code) => {
   const abi = generateABI()
   const jsonMetadata = generateJsonMetadata(abi, MAYOR_VERSION+"."+MINOR_VERSION, "emojity", "TODO", "0x"+keccak256(code), ["TODO"])
   const solidityInterface = generateSolidityInterface()
-
   return {
     bytecode: contractBytecode,
     abi: abi,

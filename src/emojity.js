@@ -32,6 +32,7 @@ const loadScripts = new Promise((resolve) => {
         "src/lib/js-sha3@0.8.0_build_sha3.min.js.js",
         "src/lib/web3_1.3.5_web3.min.js",
         "src/lib/twemoji.min.js",
+        "src/globals/globals.js",
         "src/emoji/emoji.js",
         "src/evm/evm.js",
         "src/evm/instructions.js",

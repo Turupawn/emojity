@@ -14,4 +14,4 @@ declare const emojity: Promise<{
     loadOpcodeLib: typeof loadOpcodeLib;
 }>;
 
-export = emojity; 
+export = emojity;
