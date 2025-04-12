@@ -1,7 +1,8 @@
 const MAYOR_VERSION = 1
 const MINOR_VERSION = 0
 
-var localVariables = new Map()
+resetStateVariables()
+resetLocalVariables()
 var constructorInstructions = []
 var revertDestination
 

@@ -119,9 +119,9 @@ function returnLabel(label, size) {
   let isString = false;
   if(label.length==1)
   {
-    if(localVariables.has(label[0]))
+    if(hasLocalVariable(label[0]))
     {
-      if(localVariables.get(label[0]).type == "string")
+      if(getLocalVariable(label[0]).type == "string")
       {
         isString = true
       }
@@ -179,14 +179,14 @@ function putLabelOnStack(label, performSizeAdjustement) {
 
   let size
 
-  if(localVariables.has(label))
+  if(hasLocalVariable(label))
   {
-    let position = localVariables.get(label).position
-    size = localVariables.get(label).size
+    let position = getLocalVariable(label).position
+    size = getLocalVariable(label).size
     addPush(position)
-    if(localVariables.get(label).location == "calldata") {
+    if(getLocalVariable(label).location == "calldata") {
       addOpcode("CALLDATALOAD")
-    } else if(localVariables.get(label).location == "memory") {
+    } else if(getLocalVariable(label).location == "memory") {
       addOpcode("MLOAD")
     } else
     {
@@ -228,8 +228,8 @@ function putThisOnStack() {
 
 function putMappingValueOnStack(mapLocation, keyLabel, performSizeAdjustement) {
   let keySize = 32;
-  if(localVariables.has(keyLabel))
-    keySize = localVariables.get(keyLabel).size;
+  if(hasLocalVariable(keyLabel))
+    keySize = getLocalVariable(keyLabel).size;
   else if(hasStateVariable(keyLabel))
     keySize = getStateVariable(keyLabel).size;
   else if(keyLabel == '👤' || keyLabel == '👇')
@@ -266,10 +266,10 @@ function putLabelValueOnState(label) {
   if(hasStateVariable(label))
   {
     slot = getStateVariable(label).position
-  }else if(localVariables.has(label))
+  }else if(hasLocalVariable(label))
   {
-    slot = localVariables.get(label).position
-    location = localVariables.get(label).location
+    slot = getLocalVariable(label).position
+    location = getLocalVariable(label).location
   }else
   {
     console.log("Error: Could not find label on state while trying to store: " + label)
@@ -286,8 +286,8 @@ function putLabelValueOnState(label) {
 
 function putMappingValueOnState(mapLocation, keyLabel, performSizeAdjustement) {
   let keySize = 32;
-  if(localVariables.has(keyLabel))
-    keySize = localVariables.get(keyLabel).size
+  if(hasLocalVariable(keyLabel))
+    keySize = getLocalVariable(keyLabel).size
   else if(hasStateVariable(keyLabel))
     keySize = getStateVariable(keyLabel).size
   else if(keyLabel == '👤' || keyLabel == '👇')
@@ -319,15 +319,15 @@ function putMappingValueOnState(mapLocation, keyLabel, performSizeAdjustement) {
 
 function put2dMappingValueOnStack(mapLocation, keyLabelA, keyLabelB, performSizeAdjustement) {
   let keySizeA = 32;
-  if(localVariables.has(keyLabelA))
-    keySizeA = localVariables.get(keyLabelA).size;
+  if(hasLocalVariable(keyLabelA))
+    keySizeA = getLocalVariable(keyLabelA).size;
   else if(hasStateVariable(keyLabelA))
     keySizeA = getStateVariable(keyLabelA).size;
   else if(keyLabelA == '👤' || keyLabelA == '👇')
     keySizeA = 20;
   let keySizeB = 32;
-  if(localVariables.has(keyLabelB))
-    keySizeB = localVariables.get(keyLabelB).size;
+  if(hasLocalVariable(keyLabelB))
+    keySizeB = getLocalVariable(keyLabelB).size;
   else if(hasStateVariable(keyLabelB))
     keySizeB = getStateVariable(keyLabelB).size;
   else if(keyLabelB == '👤' || keyLabelB == '👇')
@@ -366,15 +366,15 @@ function put2dMappingValueOnStack(mapLocation, keyLabelA, keyLabelB, performSize
 
 function put2dMappingValueOnState(mapLocation, keyLabelA, keyLabelB, performSizeAdjustement) {
   let keySizeA = 32;
-  if(localVariables.has(keyLabelA))
-    keySizeA = localVariables.get(keyLabelA).size;
+  if(hasLocalVariable(keyLabelA))
+    keySizeA = getLocalVariable(keyLabelA).size;
   else if(hasStateVariable(keyLabelA))
     keySizeA = getStateVariable(keyLabelA).size;
   else if(keyLabelA == '👤' || keyLabelA == '👇')
     keySizeA = 20;
   let keySizeB = 32;
-  if(localVariables.has(keyLabelB))
-    keySizeB = localVariables.get(keyLabelB).size;
+  if(hasLocalVariable(keyLabelB))
+    keySizeB = getLocalVariable(keyLabelB).size;
   else if(hasStateVariable(keyLabelB))
     keySizeB = getStateVariable(keyLabelB).size;
   else if(keyLabelB == '👤' || keyLabelB == '👇')

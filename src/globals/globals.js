@@ -3,6 +3,7 @@ var _currentJumpDestination
 var _tokens
 var _functions
 var _stateVariables
+var _localVariables
 
 function getCurrentToken() {
     return _currentToken;
@@ -81,4 +82,20 @@ function getStateVariablesSize() {
 
 function getStateVariablesEntries() {
     return _stateVariables.entries();
+}
+
+function resetLocalVariables() {
+    _localVariables = new Map();
+}
+
+function setLocalVariables(label, value) {
+    _localVariables.set(label, value);
+}
+
+function getLocalVariable(index) {
+    return _localVariables.get(index);
+}
+
+function hasLocalVariable(index) {
+    return _localVariables.has(index);
 }

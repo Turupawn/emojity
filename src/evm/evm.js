@@ -150,7 +150,7 @@ function functionLogic(jumpLocation, functionData)
   let instructions = functionData.instructions
   initMemory()
 
-  localVariables = new Map()
+  resetLocalVariables()
   for(i=0; i<parameters.length; i++)
   {
     let paramSize = 0
@@ -171,7 +171,7 @@ function functionLogic(jumpLocation, functionData)
     if(paramSize == 0) {
       console.log("Error: invalid param at EVM generation")
     }
-    localVariables.set(parameters[i].label, {position: intToHex(4 + i*32), size: paramSize, location: "calldata"})
+    setLocalVariables(parameters[i].label, {position: intToHex(4 + i*32), size: paramSize, location: "calldata"})
   }
 
   addJumpDestination(jumpLocation)
@@ -235,7 +235,7 @@ function convertInstructionToBytecode(instructionsParam) {
     )
     {
       memoryVariablePosition = allocateMemory(32)
-      localVariables.set(instructionsParam[i].label[0], {position: intToHex(memoryVariablePosition), size: 32, location: "memory", type: instructionsParam[i].type})
+      setLocalVariables(instructionsParam[i].label[0], {position: intToHex(memoryVariablePosition), size: 32, location: "memory", type: instructionsParam[i].type})
     } else if(instructionsParam[i].name == "externalCall")
     {
       utilityPushValue(instructionsParam[i].selector, true)
