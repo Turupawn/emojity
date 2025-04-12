@@ -78,7 +78,7 @@ function contractHeader(contractSize) {
   }
 
   irCode = []
-  convertInstructionToBytecode(constructorInstructions)
+  convertInstructionToBytecode(getConstructorInstructions())
 
   let constructorBytecode = irCodeToBytecode()
 

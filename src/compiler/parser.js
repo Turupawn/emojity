@@ -511,7 +511,7 @@ function parseConstructor() {
         return
     }
     nextToken()
-    constructorInstructions = parseInstructions()
+    setConstructorInstructions(parseInstructions())
 
     if(toEmoji(getToken(getCurrentToken())) != '🔚')
     {

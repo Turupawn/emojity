@@ -3,7 +3,7 @@ const MINOR_VERSION = 0
 
 resetStateVariables()
 resetLocalVariables()
-var constructorInstructions = []
+resetConstructorInstructions()
 var revertDestination
 
 function nextToken()

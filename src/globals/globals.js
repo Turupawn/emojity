@@ -4,6 +4,7 @@ var _tokens
 var _functions
 var _stateVariables
 var _localVariables
+var _constructorInstructions
 
 function getCurrentToken() {
     return _currentToken;
@@ -98,4 +99,16 @@ function getLocalVariable(index) {
 
 function hasLocalVariable(index) {
     return _localVariables.has(index);
+}
+
+function resetConstructorInstructions() {
+    _constructorInstructions = [];
+}
+
+function getConstructorInstructions() {
+    return _constructorInstructions;
+}
+
+function setConstructorInstructions(instructions) {
+    _constructorInstructions = instructions;
 }

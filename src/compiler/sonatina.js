@@ -271,7 +271,7 @@ function createConstructor() {
   blocks.set(0, {labelValues: new Map(), optimizableVariables: new Map(),  dominantBlock: null, returnType: null})
   let sonatinaCodeAdded = ""
   sonatinaCodeAdded += `func private %constructor() {\n`
-  sonatinaCodeAdded += compileBlock(constructorInstructions, nextBlock())
+  sonatinaCodeAdded += compileBlock(getConstructorInstructions(), nextBlock())
   sonatinaCodeAdded += `}\n\n`
   return sonatinaCodeAdded
 }
