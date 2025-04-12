@@ -553,7 +553,7 @@ function logEvent(topics)
 function ifStatement(condition, instructionsParam) {
   putValueOnStack(condition, false/* wtf is this */)
   addOpcode("ISZERO")
-  let endOfIfDestination = currentJumpDestination
+  let endOfIfDestination = getCurrentJumpDestination()
   nextJumpDestination()
   addPushJump(endOfIfDestination)
   addOpcode("JUMPI")
@@ -562,12 +562,12 @@ function ifStatement(condition, instructionsParam) {
 }
 
 function whileLoop(condition, instructionsParam) {
-  let startOfWhileDestination = currentJumpDestination
+  let startOfWhileDestination = getCurrentJumpDestination()
   nextJumpDestination()
   addJumpDestination(startOfWhileDestination)
   putValueOnStack(condition, false/* wtf is this */)
   addOpcode("ISZERO")
-  let endOfWhileDestination = currentJumpDestination
+  let endOfWhileDestination = getCurrentJumpDestination()
   nextJumpDestination()
   addPushJump(endOfWhileDestination)
   nextJumpDestination()

@@ -1,8 +1,6 @@
 const MAYOR_VERSION = 1
 const MINOR_VERSION = 0
 
-var currentJumpDestination
-var tokens
 var functions
 var stateVariables = new Map()
 var localVariables = new Map()
@@ -13,25 +11,25 @@ function nextToken()
 {
     do {
         advanceToken()
-    }while(getCurrentToken()<tokens.length
-        && toEmoji(tokens[getCurrentToken()]) == '🛑')
+    }while(getCurrentToken()<getTokensLength()
+        && toEmoji(getToken(getCurrentToken())) == '🛑')
 }
 
 function nextJumpDestination()
 {
-  currentJumpDestination += 1
+  addvanceCurrentJumpDestination()
 }
 
 function prepareCompilation(unicodeCodePoints) {
   resetCurrentToken()
-  currentJumpDestination = 0
+  resetCurrentJumpDestination()
   initMemory()
-  tokens = unicodeCodePoints
+  setTokens(unicodeCodePoints)
   functions = []
   stateVariables = new Map()
 
   let mayorVersion = parseInt(parseNumber())
-  let parser = tokens[getCurrentToken()]
+  let parser = getToken(getCurrentToken())
   nextToken()
   let minorVersion = parseInt(parseNumber())
 
@@ -61,11 +59,11 @@ function compileToEVMBytecode(unicodeCodePoints) {
   parse()
   
   irCode = []
-  let functionSignaturesDestination = currentJumpDestination
+  let functionSignaturesDestination = getCurrentJumpDestination()
   nextJumpDestination()
-  let loadFunctionSignaturesDestination = currentJumpDestination
+  let loadFunctionSignaturesDestination = getCurrentJumpDestination()
   nextJumpDestination()
-  revertDestination = currentJumpDestination
+  revertDestination = getCurrentJumpDestination()
   nextJumpDestination()
 
   addPushJump(functionSignaturesDestination)
@@ -74,7 +72,7 @@ function compileToEVMBytecode(unicodeCodePoints) {
   addJumpDestination(functionSignaturesDestination)
   for(let i=0; i<functions.length; i++)
   {
-      let jumpDestination = currentJumpDestination
+      let jumpDestination = getCurrentJumpDestination()
       nextJumpDestination()
       functions[i].jumpDestination = jumpDestination
 

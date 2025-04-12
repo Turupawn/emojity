@@ -1,11 +1,11 @@
 function parseNumber()
 {
-    if(getCurrentToken() >= tokens.length)
+    if(getCurrentToken() >= getTokensLength())
         return "";
     
     returnValue = ""
     do {
-        switch (toEmoji(tokens[getCurrentToken()])) {
+        switch (toEmoji(getToken(getCurrentToken()))) {
             case '0️⃣':
             returnValue += "0"
             break;
@@ -43,7 +43,7 @@ function parseNumber()
             return returnValue
         }
         nextToken()
-    } while(getCurrentToken() <= tokens.length)
+    } while(getCurrentToken() <= getTokensLength())
     return returnValue
 }
 
@@ -77,7 +77,7 @@ function parseParameter()
 {
     let parameter = ""
 
-    switch (toEmoji(tokens[getCurrentToken()])) {
+    switch (toEmoji(getToken(getCurrentToken()))) {
         case '↩️':
         return [];
         case '#️⃣':
@@ -94,13 +94,13 @@ function parseParameter()
             parameter = parseUint()
         break;
         default:
-        console.log("Error: invalid parameter: " + toEmoji(tokens[getCurrentToken()]))
+        console.log("Error: invalid parameter: " + toEmoji(getToken(getCurrentToken())))
         return;
     }
 
     nextToken()
 
-    let label = toEmoji(tokens[getCurrentToken()])
+    let label = toEmoji(getToken(getCurrentToken()))
 
     nextToken()
 
@@ -112,10 +112,10 @@ function parseParameter()
 function parseInstructions()
 {
     let instructions = []
-    while(getCurrentToken() < tokens.length
-            && toEmoji(tokens[getCurrentToken()]) != '🔚')
+    while(getCurrentToken() < getTokensLength()
+            && toEmoji(getToken(getCurrentToken())) != '🔚')
     {
-        if(toEmoji(tokens[getCurrentToken()]) == '↩️')
+        if(toEmoji(getToken(getCurrentToken())) == '↩️')
         {
             nextToken()
             let returnedValue = parseVariable()
@@ -125,10 +125,10 @@ function parseInstructions()
                 returnedValue = BigInt(parseNumber())
             instructions.push({name: "return", value: returnedValue})
             break;
-        }else if(toEmoji(tokens[getCurrentToken()]) == '📑')
+        }else if(toEmoji(getToken(getCurrentToken())) == '📑')
         {
             let topics = []
-            while(toEmoji(tokens[getCurrentToken()]) == '📑')
+            while(toEmoji(getToken(getCurrentToken())) == '📑')
             {
                 nextToken()
                 let variable = parseVariable()
@@ -142,11 +142,11 @@ function parseInstructions()
                 }
             }
             instructions.push({name: "logEvent", topics})
-        } else if(toEmoji(tokens[getCurrentToken()]) == '❓'){
+        } else if(toEmoji(getToken(getCurrentToken())) == '❓'){
             nextToken()
             let condition = parseVariable()
-            while(toEmoji(tokens[getCurrentToken()]) == '🏁'
-                || toEmoji(tokens[getCurrentToken()]) == '🛑')
+            while(toEmoji(getToken(getCurrentToken())) == '🏁'
+                || toEmoji(getToken(getCurrentToken())) == '🛑')
             {
                 nextToken()
             }
@@ -154,7 +154,7 @@ function parseInstructions()
             nextToken()
 
             instructions.push({name: "ifStatement", condition: condition, instructions: ifConditions})
-        } else if(toEmoji(tokens[getCurrentToken()]) == '🔄'){
+        } else if(toEmoji(getToken(getCurrentToken())) == '🔄'){
             nextToken()
             let condition = parseVariable()
             nextToken()
@@ -162,34 +162,34 @@ function parseInstructions()
             let instructionsLoop = parseInstructions()
             nextToken()
             instructions.push({name: "whileLoop", condition: condition, instructions: instructionsLoop})
-        } else if(toEmoji(tokens[getCurrentToken()]) == '🔢')
+        } else if(toEmoji(getToken(getCurrentToken())) == '🔢')
         {
             nextToken()
             let label = parseVariable()
             instructions.push({name: "declareUint", label: label, type: "uint"})
-        } else if(toEmoji(tokens[getCurrentToken()]) == '#️⃣')
+        } else if(toEmoji(getToken(getCurrentToken())) == '#️⃣')
         {
             nextToken()
             let label = parseVariable()
             instructions.push({name: "declareAddress", label: label, type: "address"})
-        } else if(toEmoji(tokens[getCurrentToken()]) == '🔡')
+        } else if(toEmoji(getToken(getCurrentToken())) == '🔡')
         {
             nextToken()
             let label = parseVariable()
             instructions.push({name: "declareString", label: label, type: "string"})
-        }else if(toEmoji(tokens[getCurrentToken()]) == '☯️')
+        }else if(toEmoji(getToken(getCurrentToken())) == '☯️')
         {
             nextToken()
             let label = parseVariable()
             instructions.push({name: "declareBool", label: label, type: "bool"})
-        }else if(toEmoji(tokens[getCurrentToken()]) == '📡')
+        }else if(toEmoji(getToken(getCurrentToken())) == '📡')
         {
             nextToken()
             let contractAddress = parseNumber()
             let contractAddressType = "literal"
             if(contractAddress == "")
             {
-                contractAddress = [''+toEmoji(tokens[getCurrentToken()])]
+                contractAddress = [''+toEmoji(getToken(getCurrentToken()))]
                 contractAddressType = "variable"
                 nextToken()
             } else {
@@ -200,7 +200,7 @@ function parseInstructions()
             let selectorType = "literal"
             if(selector == "")
             {
-                selector = [''+toEmoji(tokens[getCurrentToken()])]
+                selector = [''+toEmoji(getToken(getCurrentToken()))]
                 selectorType = "variable"
                 nextToken()
             } else {
@@ -211,7 +211,7 @@ function parseInstructions()
             let ethValueType = "literal"
             if(ethValue == "")
             {
-                ethValue = [''+toEmoji(tokens[getCurrentToken()])]
+                ethValue = [''+toEmoji(getToken(getCurrentToken()))]
                 ethValueType = "variable"
                 nextToken()
             } else {
@@ -222,7 +222,7 @@ function parseInstructions()
             let gasType = "literal"
             if(gas == "")
             {
-                gas = [''+toEmoji(tokens[getCurrentToken()])]
+                gas = [''+toEmoji(getToken(getCurrentToken()))]
                 gasType = "variable"
                 nextToken()
             } else {
@@ -230,8 +230,8 @@ function parseInstructions()
             }
 
             let params = []
-            while(toEmoji(tokens[getCurrentToken()]) == '#️⃣'
-                    || toEmoji(tokens[getCurrentToken()]) == '🔢')
+            while(toEmoji(getToken(getCurrentToken())) == '#️⃣'
+                    || toEmoji(getToken(getCurrentToken())) == '🔢')
             {
                 nextToken()
                 let value = parseNumber()
@@ -247,10 +247,10 @@ function parseInstructions()
             }
 
             let returnValueStorage = null;
-            if(toEmoji(tokens[getCurrentToken()]) == '📥')
+            if(toEmoji(getToken(getCurrentToken())) == '📥')
             {
                 nextToken()
-                returnValueStorage = [''+toEmoji(tokens[getCurrentToken()])]
+                returnValueStorage = [''+toEmoji(getToken(getCurrentToken()))]
                 nextToken()
             }
 
@@ -262,7 +262,7 @@ function parseInstructions()
                 params: params,
                 returnValueStorage: returnValueStorage
             })
-        }else if(toEmoji(tokens[getCurrentToken()]) == '❌')
+        }else if(toEmoji(getToken(getCurrentToken())) == '❌')
         {
             instructions.push({name: "revert"})
             nextToken()
@@ -285,25 +285,25 @@ function parseInstructions()
                 {
                     let operator = ""
                     let rrValue = ""
-                    if(toEmoji(tokens[getCurrentToken()]) == '➖')
+                    if(toEmoji(getToken(getCurrentToken())) == '➖')
                     {
                         operator = '➖'
-                    } else if(toEmoji(tokens[getCurrentToken()]) == '➕')
+                    } else if(toEmoji(getToken(getCurrentToken())) == '➕')
                     {
                         operator = '➕'
-                    } else if(toEmoji(tokens[getCurrentToken()]) == '✖️')
+                    } else if(toEmoji(getToken(getCurrentToken())) == '✖️')
                     {
                         operator = '✖️'
-                    } else if(toEmoji(tokens[getCurrentToken()]) == '➗')
+                    } else if(toEmoji(getToken(getCurrentToken())) == '➗')
                     {
                         operator = '➗'
-                    } else if(toEmoji(tokens[getCurrentToken()]) == '⬆️')
+                    } else if(toEmoji(getToken(getCurrentToken())) == '⬆️')
                     {
                         operator = '⬆️'
-                    } else if(toEmoji(tokens[getCurrentToken()]) == '⬇️')
+                    } else if(toEmoji(getToken(getCurrentToken())) == '⬇️')
                     {
                         operator = '⬇️'
-                    } else if(toEmoji(tokens[getCurrentToken()]) == '🟰')
+                    } else if(toEmoji(getToken(getCurrentToken())) == '🟰')
                     {
                         operator = '🟰'
                     }
@@ -346,17 +346,17 @@ function parseInstructions()
 
 function parseFunction()
 {
-    if(getCurrentToken() >= tokens.length)
+    if(getCurrentToken() >= getTokensLength())
         return;
     
-    functionName = getEmojiDescription(toEmoji(tokens[getCurrentToken()]))
+    functionName = getEmojiDescription(toEmoji(getToken(getCurrentToken())))
     nextToken()
-    functionName += getEmojiDescription(toEmoji(tokens[getCurrentToken()]))
+    functionName += getEmojiDescription(toEmoji(getToken(getCurrentToken())))
     functionName = convertToFunctionName(functionName)
     nextToken()
 
     visibility = ""
-    switch (toEmoji(tokens[getCurrentToken()])) {
+    switch (toEmoji(getToken(getCurrentToken()))) {
         case '👀':
             visibility = "view"
         break;
@@ -364,7 +364,7 @@ function parseFunction()
             visibility = "nonpayable"
         break;
         default:
-            console.log("Error: missing function visibility found " + toEmoji(tokens[getCurrentToken()]))
+            console.log("Error: missing function visibility found " + toEmoji(getToken(getCurrentToken())))
         return;
     }
 
@@ -373,7 +373,7 @@ function parseFunction()
 
     nextToken()
     returnType = ""
-    switch (toEmoji(tokens[getCurrentToken()])) {
+    switch (toEmoji(getToken(getCurrentToken()))) {
         case '#️⃣':
             returnType = "address"
         break;
@@ -394,9 +394,9 @@ function parseFunction()
 
     nextToken()
 
-    if(toEmoji(tokens[getCurrentToken()]) != '🏁')
+    if(toEmoji(getToken(getCurrentToken())) != '🏁')
     {
-        console.log("Error: 🏁 expected, " + toEmoji(tokens[getCurrentToken()]) + ' found')
+        console.log("Error: 🏁 expected, " + toEmoji(getToken(getCurrentToken())) + ' found')
     }
 
     advanceToken()
@@ -421,36 +421,36 @@ function parseFunction()
 function parseVariable()
 {
     let variableName = []
-    while(getCurrentToken() < tokens.length
-        && toEmoji(tokens[getCurrentToken()]) != '📥'
-        && toEmoji(tokens[getCurrentToken()]) != '➖'
-        && toEmoji(tokens[getCurrentToken()]) != '✖️'
-        && toEmoji(tokens[getCurrentToken()]) != '➕'
-        && toEmoji(tokens[getCurrentToken()]) != '🟰'
-        && toEmoji(tokens[getCurrentToken()]) != '➗'
-        && toEmoji(tokens[getCurrentToken()]) != '⬆️'
-        && toEmoji(tokens[getCurrentToken()]) != '⬇️'
-        && toEmoji(tokens[getCurrentToken()]) != '🛑'
-        && toEmoji(tokens[getCurrentToken()]) != '0️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '1️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '2️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '3️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '4️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '5️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '6️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '7️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '8️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '9️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '📑'
-        && toEmoji(tokens[getCurrentToken()]) != '#️⃣'
-        && toEmoji(tokens[getCurrentToken()]) != '🔡'
-        && toEmoji(tokens[getCurrentToken()]) != '☯️'
-        && toEmoji(tokens[getCurrentToken()]) != '🔢'
-        && toEmoji(tokens[getCurrentToken()]) != '❌'
-        && toEmoji(tokens[getCurrentToken()]) != '📡'
+    while(getCurrentToken() < getTokensLength()
+        && toEmoji(getToken(getCurrentToken())) != '📥'
+        && toEmoji(getToken(getCurrentToken())) != '➖'
+        && toEmoji(getToken(getCurrentToken())) != '✖️'
+        && toEmoji(getToken(getCurrentToken())) != '➕'
+        && toEmoji(getToken(getCurrentToken())) != '🟰'
+        && toEmoji(getToken(getCurrentToken())) != '➗'
+        && toEmoji(getToken(getCurrentToken())) != '⬆️'
+        && toEmoji(getToken(getCurrentToken())) != '⬇️'
+        && toEmoji(getToken(getCurrentToken())) != '🛑'
+        && toEmoji(getToken(getCurrentToken())) != '0️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '1️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '2️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '3️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '4️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '5️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '6️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '7️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '8️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '9️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '📑'
+        && toEmoji(getToken(getCurrentToken())) != '#️⃣'
+        && toEmoji(getToken(getCurrentToken())) != '🔡'
+        && toEmoji(getToken(getCurrentToken())) != '☯️'
+        && toEmoji(getToken(getCurrentToken())) != '🔢'
+        && toEmoji(getToken(getCurrentToken())) != '❌'
+        && toEmoji(getToken(getCurrentToken())) != '📡'
         )
     {
-        variableName.push(toEmoji(tokens[getCurrentToken()]))
+        variableName.push(toEmoji(getToken(getCurrentToken())))
         advanceToken()
     }
     return variableName
@@ -461,7 +461,7 @@ function parseStateVariable()
     let type = ""
     let variableSize = 0;
 
-    switch (toEmoji(tokens[getCurrentToken()])) {
+    switch (toEmoji(getToken(getCurrentToken()))) {
         case '🗺️':
             type = "mapping"
             variableSize = 32
@@ -493,7 +493,7 @@ function parseStateVariable()
 
     nextToken()
 
-    let label = toEmoji(tokens[getCurrentToken()])
+    let label = toEmoji(getToken(getCurrentToken()))
 
     nextToken()
 
@@ -502,10 +502,10 @@ function parseStateVariable()
 }
 
 function parseConstructor() {
-    if(toEmoji(tokens[getCurrentToken()]) != '👷')
+    if(toEmoji(getToken(getCurrentToken())) != '👷')
         return
     nextToken()
-    if(toEmoji(tokens[getCurrentToken()]) != '🏁')
+    if(toEmoji(getToken(getCurrentToken())) != '🏁')
     {
         console.log("Error: 🏁 expected in constructor")
         return
@@ -513,7 +513,7 @@ function parseConstructor() {
     nextToken()
     constructorInstructions = parseInstructions()
 
-    if(toEmoji(tokens[getCurrentToken()]) != '🔚')
+    if(toEmoji(getToken(getCurrentToken())) != '🔚')
     {
         console.log("Error: 🔚 expected at the end of constructor")
         return
