@@ -1,7 +1,6 @@
 const MAYOR_VERSION = 1
 const MINOR_VERSION = 0
 
-var stateVariables = new Map()
 var localVariables = new Map()
 var constructorInstructions = []
 var revertDestination
@@ -25,7 +24,7 @@ function prepareCompilation(unicodeCodePoints) {
   initMemory()
   setTokens(unicodeCodePoints)
   resetFunctions()
-  stateVariables = new Map()
+  resetStateVariables()
 
   let mayorVersion = parseInt(parseNumber())
   let parser = getToken(getCurrentToken())

@@ -136,14 +136,14 @@ function loadRValue(rvalue, block) {
     returnValue = nextValue()
     type = "i256"
     sonatinaCodeAdded = `    v${returnValue}.${type} = evm_callvalue;\n`
-  } else if(stateVariables.has(rvalue[0])) {
-    type = solidityTypeToSonatinaType(stateVariables.get(rvalue[0]).type)
+  } else if(hasStateVariable(rvalue[0])) {
+    type = solidityTypeToSonatinaType(getStateVariable(rvalue[0]).type)
     if(blocks.get(block).dominantBlock != null && blocks.get(blocks.get(block).dominantBlock).optimizableVariables != null
       && blocks.get(blocks.get(block).dominantBlock).optimizableVariables.has(rvalue[0])) {
       returnValue = blocks.get(blocks.get(block).dominantBlock).optimizableVariables.get(rvalue[0]).value
     } else {
       returnValue = nextValue()
-      sonatinaCodeAdded = `    v${returnValue}.${type} = evm_sload $${stateVariables.get(rvalue[0]).description};\n`
+      sonatinaCodeAdded = `    v${returnValue}.${type} = evm_sload $${getStateVariable(rvalue[0]).description};\n`
     }
   } else {
     returnValue = labelToValue(rvalue[0], block).value
@@ -155,19 +155,19 @@ function loadRValue(rvalue, block) {
 function storeLValue(lvalueLabel, rvalue, block) {
   let type = null
   let sonatinaCodeAdded = ""
-  if(stateVariables.has(lvalueLabel[0])) {
+  if(hasStateVariable(lvalueLabel[0])) {
     if(lvalueLabel.length > 1) {
       type = "i256"
       let mappingPositionValue = getMappingPositionValue(lvalueLabel[0], lvalueLabel[1], block)
       sonatinaCodeAdded += mappingPositionValue.sonatinaCodeAdded
       sonatinaCodeAdded += `    evm_sstore v${mappingPositionValue.value} ${rValueToString(rvalue.value, rvalue.type)};\n`
     } else {
-      type = solidityTypeToSonatinaType(stateVariables.get(lvalueLabel[0]).type)
+      type = solidityTypeToSonatinaType(getStateVariable(lvalueLabel[0]).type)
       if(blocks.get(block).dominantBlock != null && blocks.get(blocks.get(block).dominantBlock).optimizableVariables != null
         && blocks.get(blocks.get(block).dominantBlock).optimizableVariables.has(lvalueLabel[0])) {
         blocks.get(blocks.get(block).dominantBlock).optimizableVariables.get(lvalueLabel[0]).value = rvalue.value
       } else {
-        sonatinaCodeAdded += `    evm_sstore $${stateVariables.get(lvalueLabel[0]).description} ${rValueToString(rvalue.value, rvalue.type)};\n`
+        sonatinaCodeAdded += `    evm_sstore $${getStateVariable(lvalueLabel[0]).description} ${rValueToString(rvalue.value, rvalue.type)};\n`
       }
     }
   } else {
@@ -198,7 +198,7 @@ function getMappingPositionValue(mappingLabel, keyLabel, block) {
   sonatinaCodeAdded += `    v${keccackOffsetValue}.i256 = evm_malloc 64.i256;\n`
   sonatinaCodeAdded += `    v${keccackKeyValue}.i256 = add v${keccackOffsetValue} 32.i256;\n`
   sonatinaCodeAdded += `    evm_mstore v${keccackOffsetValue} v${mappingKeyLoadValue.value};\n`
-  sonatinaCodeAdded += `    evm_mstore v${keccackKeyValue} $${stateVariables.get(mappingLabel).description};\n`
+  sonatinaCodeAdded += `    evm_mstore v${keccackKeyValue} $${getStateVariable(mappingLabel).description};\n`
   sonatinaCodeAdded += `    v${returnValue}.${type} = evm_keccak256 v${keccackOffsetValue} 64.i256;\n`
   return {value: returnValue, type: type, sonatinaCodeAdded: sonatinaCodeAdded}
 }
@@ -284,9 +284,9 @@ function compileToSonatina(unicodeCodePoints) {
   returnValuesUsed = new Set();
   let sonatinaCode = ""
 
-  for (const [label, value] of stateVariables.entries()) {
-    let type = solidityTypeToSonatinaType(stateVariables.get(label).type)
-    sonatinaCode += `global private const *${type} $${stateVariables.get(label).description} = ${stateVariables.get(label).position};\n`
+  for (const [label, value] of getStateVariablesEntries()) {
+    let type = solidityTypeToSonatinaType(getStateVariable(label).type)
+    sonatinaCode += `global private const *${type} $${getStateVariable(label).description} = ${getStateVariable(label).position};\n`
   }
 
   if(sonatinaCode != "")
@@ -393,7 +393,7 @@ function compileToSonatina(unicodeCodePoints) {
 
 function checkSSTOREOptimizations(instructions) {
   let optimizableVariables = new Set()
-  for (const [label, value] of stateVariables.entries()) {
+  for (const [label, value] of getStateVariablesEntries()) {
     let labelIsUsed = false
     let blockIsOptimizable = true
     for(let i=0; i<instructions.length; i++) {
@@ -537,8 +537,8 @@ function compileBlock(instructions, currentBlock, /* optional */ parrentBlock) {
 
       for (const optimizableVariable of optimizableVariablesLabels) {
         let value = nextValue()
-        let type = solidityTypeToSonatinaType(stateVariables.get(optimizableVariable).type)
-        compiledSonatinaInstructions += `    v${value}.${type} = evm_sload $${stateVariables.get(optimizableVariable).description};\n`
+        let type = solidityTypeToSonatinaType(getStateVariable(optimizableVariable).type)
+        compiledSonatinaInstructions += `    v${value}.${type} = evm_sload $${getStateVariable(optimizableVariable).description};\n`
         blocks.get(currentBlock).optimizableVariables.set(optimizableVariable, {value: value, type: type})
       }
 
@@ -597,8 +597,8 @@ function compileBlock(instructions, currentBlock, /* optional */ parrentBlock) {
 
         if(instructions[i].params[j].type == "literal") {
           argsSize += 32n
-        } else if(stateVariables.has(instructions[i].params[j].value[0])) {
-          let type = solidityTypeToSonatinaType(stateVariables.get(instructions[i].params[j].value[0]).type)
+        } else if(hasStateVariable(instructions[i].params[j].value[0])) {
+          let type = solidityTypeToSonatinaType(getStateVariable(instructions[i].params[j].value[0]).type)
           argsSize += sonatinaTypeToSize(type)
         } else if(instructions[i].params[j].value[0] == '👤') {
           argsSize += 20n

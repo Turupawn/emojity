@@ -2,6 +2,7 @@ var _currentToken
 var _currentJumpDestination
 var _tokens
 var _functions
+var _stateVariables
 
 function getCurrentToken() {
     return _currentToken;
@@ -56,4 +57,28 @@ function getFunction(index) {
 
 function addFunction(_function) {
     _functions.push(_function);
+}
+
+function resetStateVariables() {
+    _stateVariables = new Map();
+}
+
+function getStateVariable(index) {
+    return _stateVariables.get(index);
+}
+
+function hasStateVariable(index) {
+    return _stateVariables.has(index);
+}
+
+function addStateVariable(label, value) {
+    _stateVariables.set(label, value);
+}
+
+function getStateVariablesSize() {
+    return _stateVariables.size;
+}
+
+function getStateVariablesEntries() {
+    return _stateVariables.entries();
 }

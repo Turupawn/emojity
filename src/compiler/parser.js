@@ -497,7 +497,7 @@ function parseStateVariable()
 
     nextToken()
 
-    stateVariables.set(label, {type: type, position: stateVariables.size, size: variableSize, description: getEmojiDescription(label).toUpperCase()})
+    addStateVariable(label, {type: type, position: getStateVariablesSize(), size: variableSize, description: getEmojiDescription(label).toUpperCase()})
     return true
 }
 

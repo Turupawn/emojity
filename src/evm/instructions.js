@@ -125,9 +125,9 @@ function returnLabel(label, size) {
       {
         isString = true
       }
-    }else if(stateVariables.has(label[0]))
+    }else if(hasStateVariable(label[0]))
     {
-      if(stateVariables.get(label[0]).type == "string")
+      if(getStateVariable(label[0]).type == "string")
       {
         isString = true
       }
@@ -192,10 +192,10 @@ function putLabelOnStack(label, performSizeAdjustement) {
     {
       console.log("ERROR: Invalid location, expected calldata or memory")
     }
-  }else if(stateVariables.has(label))
+  }else if(hasStateVariable(label))
   {
     size = 32
-    let slot = stateVariables.get(label).position
+    let slot = getStateVariable(label).position
     addPush(intToHex(slot))
     addOpcode("SLOAD")
   }else
@@ -230,8 +230,8 @@ function putMappingValueOnStack(mapLocation, keyLabel, performSizeAdjustement) {
   let keySize = 32;
   if(localVariables.has(keyLabel))
     keySize = localVariables.get(keyLabel).size;
-  else if(stateVariables.has(keyLabel))
-    keySize = stateVariables.get(keyLabel).size;
+  else if(hasStateVariable(keyLabel))
+    keySize = getStateVariable(keyLabel).size;
   else if(keyLabel == '👤' || keyLabel == '👇')
     keySize = 20;
 
@@ -263,9 +263,9 @@ function putMappingValueOnStack(mapLocation, keyLabel, performSizeAdjustement) {
 function putLabelValueOnState(label) {
   let slot = ""
   let location = "state"
-  if(stateVariables.has(label))
+  if(hasStateVariable(label))
   {
-    slot = stateVariables.get(label).position
+    slot = getStateVariable(label).position
   }else if(localVariables.has(label))
   {
     slot = localVariables.get(label).position
@@ -288,8 +288,8 @@ function putMappingValueOnState(mapLocation, keyLabel, performSizeAdjustement) {
   let keySize = 32;
   if(localVariables.has(keyLabel))
     keySize = localVariables.get(keyLabel).size
-  else if(stateVariables.has(keyLabel))
-    keySize = stateVariables.get(keyLabel).size
+  else if(hasStateVariable(keyLabel))
+    keySize = getStateVariable(keyLabel).size
   else if(keyLabel == '👤' || keyLabel == '👇')
     keySize = 20;
 
@@ -321,15 +321,15 @@ function put2dMappingValueOnStack(mapLocation, keyLabelA, keyLabelB, performSize
   let keySizeA = 32;
   if(localVariables.has(keyLabelA))
     keySizeA = localVariables.get(keyLabelA).size;
-  else if(stateVariables.has(keyLabelA))
-    keySizeA = stateVariables.get(keyLabelA).size;
+  else if(hasStateVariable(keyLabelA))
+    keySizeA = getStateVariable(keyLabelA).size;
   else if(keyLabelA == '👤' || keyLabelA == '👇')
     keySizeA = 20;
   let keySizeB = 32;
   if(localVariables.has(keyLabelB))
     keySizeB = localVariables.get(keyLabelB).size;
-  else if(stateVariables.has(keyLabelB))
-    keySizeB = stateVariables.get(keyLabelB).size;
+  else if(hasStateVariable(keyLabelB))
+    keySizeB = getStateVariable(keyLabelB).size;
   else if(keyLabelB == '👤' || keyLabelB == '👇')
     keySizeB = 20;
 
@@ -368,15 +368,15 @@ function put2dMappingValueOnState(mapLocation, keyLabelA, keyLabelB, performSize
   let keySizeA = 32;
   if(localVariables.has(keyLabelA))
     keySizeA = localVariables.get(keyLabelA).size;
-  else if(stateVariables.has(keyLabelA))
-    keySizeA = stateVariables.get(keyLabelA).size;
+  else if(hasStateVariable(keyLabelA))
+    keySizeA = getStateVariable(keyLabelA).size;
   else if(keyLabelA == '👤' || keyLabelA == '👇')
     keySizeA = 20;
   let keySizeB = 32;
   if(localVariables.has(keyLabelB))
     keySizeB = localVariables.get(keyLabelB).size;
-  else if(stateVariables.has(keyLabelB))
-    keySizeB = stateVariables.get(keyLabelB).size;
+  else if(hasStateVariable(keyLabelB))
+    keySizeB = getStateVariable(keyLabelB).size;
   else if(keyLabelB == '👤' || keyLabelB == '👇')
     keySizeB = 20;
 
@@ -418,12 +418,12 @@ function putValueOnStack(label, performSizeAdjustement) {
     return
   }else if(label.length == 2)
   {
-    let mapLocation = intToHex(stateVariables.get(label[0]).position)
+    let mapLocation = intToHex(getStateVariable(label[0]).position)
     putMappingValueOnStack(mapLocation, label[1], performSizeAdjustement)
     return
   }else if(label.length == 3)
   {
-    let mapLocation = intToHex(stateVariables.get(label[0]).position)
+    let mapLocation = intToHex(getStateVariable(label[0]).position)
     put2dMappingValueOnStack(mapLocation, label[1], label[2], performSizeAdjustement)
     return
   }else{
@@ -438,12 +438,12 @@ function putValueOnState(label, performSizeAdjustement) {
     return
   }else if(label.length == 2)
   {
-    let mapLocation = intToHex(stateVariables.get(label[0]).position)
+    let mapLocation = intToHex(getStateVariable(label[0]).position)
     putMappingValueOnState(mapLocation, label[1], performSizeAdjustement)
     return
   }else if(label.length == 3)
   {
-    let mapLocation = intToHex(stateVariables.get(label[0]).position)
+    let mapLocation = intToHex(getStateVariable(label[0]).position)
     put2dMappingValueOnState(mapLocation, label[1], label[2], performSizeAdjustement)
     return
   }else{
