@@ -300,29 +300,29 @@ function compileToSonatina(unicodeCodePoints) {
   sonatinaCode += `    v${nextValue()}.i256 = evm_call_data_load 0.i256;\n`
   sonatinaCode += `    v${nextValue()}.i256 = shr v0 224.i256;\n`
   sonatinaCode += `    br_table v1 block1`
-  for(let i=0; i<functions.length; i++)
+  for(let i=0; i<getFunctionsLength(); i++)
   {
-    let signature = getSelector(getFunctionSignature(functions[i].name, functions[i].parameters)).substring(0, 8).toUpperCase()
+    let signature = getSelector(getFunctionSignature(getFunction(i).name, getFunction(i).parameters)).substring(0, 8).toUpperCase()
     sonatinaCode += ` (0x${signature}.i32 block${(i+2)})`
   }
   sonatinaCode += `;\n`
 
-  for(let i=0; i<functions.length; i++)
+  for(let i=0; i<getFunctionsLength(); i++)
   {
     sonatinaCode += `  block${(i+2)}:\n`
 
     let values = []
-    for(let j=0; j<functions[i].parameters.length; j++) {
+    for(let j=0; j<getFunction(i).parameters.length; j++) {
       values.push(nextValue())
     }
 
-    for(let j=0; j<functions[i].parameters.length; j++) {
+    for(let j=0; j<getFunction(i).parameters.length; j++) {
       sonatinaCode += `    v${values[j]}.i256 = evm_call_data_load ${j+1}.i8;\n`
     }
-    let functionType = solidityTypeToSonatinaType(functions[i].returnType)
+    let functionType = solidityTypeToSonatinaType(getFunction(i).returnType)
     let functionTypeValue = nextValue()
-    sonatinaCode += `    v${functionTypeValue}.${functionType} = call %${functions[i].name}`
-    for(let j=0; j<functions[i].parameters.length; j++) {
+    sonatinaCode += `    v${functionTypeValue}.${functionType} = call %${getFunction(i).name}`
+    for(let j=0; j<getFunction(i).parameters.length; j++) {
       sonatinaCode += ` v${values[j]}`
     }
     sonatinaCode += `;\n`
@@ -350,34 +350,34 @@ function compileToSonatina(unicodeCodePoints) {
   sonatinaCode += `    evm_revert 0.i256 0.i256;\n`
   sonatinaCode += `}\n\n`
 
-  for(let i=0; i<functions.length; i++)
+  for(let i=0; i<getFunctionsLength(); i++)
   {
     initSonatinaFunction()
 
-    blocks.set(0, {labelValues: new Map(), optimizableVariables: new Map(),  dominantBlock: null, returnType: functions[i].returnType})
+    blocks.set(0, {labelValues: new Map(), optimizableVariables: new Map(),  dominantBlock: null, returnType: getFunction(i).returnType})
 
-    sonatinaCode += "func private %" + functions[i].name
+    sonatinaCode += "func private %" + getFunction(i).name
     sonatinaCode += "("
-    for(let j=0; j<functions[i].parameters.length; j++) {
+    for(let j=0; j<getFunction(i).parameters.length; j++) {
       let value = nextValue()
-      let type = solidityTypeToSonatinaType(functions[i].parameters[j].type)
+      let type = solidityTypeToSonatinaType(getFunction(i).parameters[j].type)
       sonatinaCode += "v"+value+"."+type
-      if(j+1<functions[i].parameters.length) {
+      if(j+1<getFunction(i).parameters.length) {
         sonatinaCode += ", "
       }
-      blocks.get(0).labelValues.set(functions[i].parameters[j].label, { value: value, type: type})
-      labelTypes.set(functions[i].parameters[j].label, type)
+      blocks.get(0).labelValues.set(getFunction(i).parameters[j].label, { value: value, type: type})
+      labelTypes.set(getFunction(i).parameters[j].label, type)
     }
     sonatinaCode += ")"
-    if(functions[i].returnType)
-      sonatinaCode += " -> " + solidityTypeToSonatinaType(functions[i].returnType) + " "
+    if(getFunction(i).returnType)
+      sonatinaCode += " -> " + solidityTypeToSonatinaType(getFunction(i).returnType) + " "
     sonatinaCode += "{\n"
-    sonatinaCode += compileBlock(functions[i].instructions, nextBlock())
+    sonatinaCode += compileBlock(getFunction(i).instructions, nextBlock())
     sonatinaCode += "}\n\n"
   }
-  for(let i=0; i<functions.length; i++)
+  for(let i=0; i<getFunctionsLength(); i++)
   {
-      functionLogic(functions[i].jumpDestination, functions[i])
+      functionLogic(getFunction(i).jumpDestination, getFunction(i))
   }
 
   if(returnValuesUsed.has("uint")) {

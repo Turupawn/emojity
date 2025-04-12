@@ -1,6 +1,7 @@
 var _currentToken
 var _currentJumpDestination
 var _tokens
+var _functions
 
 function getCurrentToken() {
     return _currentToken;
@@ -39,4 +40,20 @@ function getTokensLength() {
 
 function getToken(index) {
     return _tokens[index];
+}
+
+function resetFunctions() {
+    _functions = [];
+}
+
+function getFunctionsLength() {
+    return _functions.length;
+}
+
+function getFunction(index) {
+    return _functions[index];
+}
+
+function addFunction(_function) {
+    _functions.push(_function);
 }

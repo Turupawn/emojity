@@ -413,7 +413,7 @@ function parseFunction()
 
     nextToken()
 
-    functions.push({name: functionNameConversor(functionName), parameters: parameters, returnType: returnType, visibility: visibility, instructions: instructions})
+    addFunction({name: functionNameConversor(functionName), parameters: parameters, returnType: returnType, visibility: visibility, instructions: instructions})
 
     parseFunction()
 }

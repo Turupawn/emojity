@@ -1,7 +1,6 @@
 const MAYOR_VERSION = 1
 const MINOR_VERSION = 0
 
-var functions
 var stateVariables = new Map()
 var localVariables = new Map()
 var constructorInstructions = []
@@ -25,7 +24,7 @@ function prepareCompilation(unicodeCodePoints) {
   resetCurrentJumpDestination()
   initMemory()
   setTokens(unicodeCodePoints)
-  functions = []
+  resetFunctions()
   stateVariables = new Map()
 
   let mayorVersion = parseInt(parseNumber())
@@ -70,21 +69,21 @@ function compileToEVMBytecode(unicodeCodePoints) {
   addPushJump(loadFunctionSignaturesDestination)
   addOpcode("JUMP")
   addJumpDestination(functionSignaturesDestination)
-  for(let i=0; i<functions.length; i++)
+  for(let i=0; i<getFunctionsLength(); i++)
   {
       let jumpDestination = getCurrentJumpDestination()
       nextJumpDestination()
-      functions[i].jumpDestination = jumpDestination
+      getFunction(i).jumpDestination = jumpDestination
 
-      functionSignature = getFunctionSignature(functions[i].name, functions[i].parameters)
+      functionSignature = getFunctionSignature(getFunction(i).name, getFunction(i).parameters)
       selectorLookupIr(functionSignature, jumpDestination)
   }
   addPush("00")
   addOpcode("DUP1")
   addOpcode("REVERT")
-  for(let i=0; i<functions.length; i++)
+  for(let i=0; i<getFunctionsLength(); i++)
   {
-      functionLogic(functions[i].jumpDestination, functions[i])
+      functionLogic(getFunction(i).jumpDestination, getFunction(i))
   }
   addJumpDestination(loadFunctionSignaturesDestination)
   addPush("00")
@@ -132,9 +131,9 @@ function generateSolidityInterface() {
   let solidityInterface = '// SPDX-License-Identifier: MIT\n'
   solidityInterface += 'pragma solidity ^0.8.20;\n\n'
   solidityInterface += 'interface EmojiContract {\n'
-  for(let i=0; i<functions.length; i++)
+  for(let i=0; i<getFunctionsLength(); i++)
   {
-    let fn = functions[i]
+    let fn = getFunction(i)
     solidityInterface += '\tfunction '
     solidityInterface += fn.name + '('
     for(let j=0; j<fn.parameters.length; j++)
@@ -174,9 +173,9 @@ function generateSolidityInterface() {
 
 function generateABI() {
   var abi = '['
-  for(let i=0; i<functions.length; i++)
+  for(let i=0; i<getFunctionsLength(); i++)
   {
-    let fn = functions[i]
+    let fn = getFunction(i)
     if(i!=0)
     {
       abi += ','
