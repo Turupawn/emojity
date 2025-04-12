@@ -1,7 +1,7 @@
 // Helper to check if we're in browser environment
 const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
 
-if (isBrowser) {
+if (!isBrowser) {
   const { loadEmojiLib } = require('./emoji/emoji');
   const { loadOpcodeLib } = require('./evm/evm');
   const { compile } = require('./compiler/compiler');
@@ -35,7 +35,7 @@ const loadScripts = new Promise((resolve) => {
 
     const scripts = [
         "src/lib/emoji-mart@latest_dist_browser.js",
-        "src/lib/js-sha3@0.8.0_build_sha3.min.js.js",
+        "src/lib/js-sha3@0.8.0_build_sha3.min.js",
         "src/lib/web3_1.3.5_web3.min.js",
         "src/lib/twemoji.min.js",
         "src/globals/globals.js",

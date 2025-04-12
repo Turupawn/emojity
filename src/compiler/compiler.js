@@ -285,7 +285,5 @@ const deploy = async (abi, bytecode) => {
 }
 
 if (typeof window == 'undefined') {
-  module.exports = { compile };
+  module.exports = { compile, nextToken, prepareCompilation, parse };
 }
-
-module.exports = { compile, nextToken, prepareCompilation, parse };
