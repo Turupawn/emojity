@@ -1,3 +1,9 @@
+if (typeof window == 'undefined') {
+  const { getFunction, getFunctionsLength, getStateVariable, getStateVariablesEntries, parseConstructor } = require('./parser');
+  const { getSelector, functionNameConversor } = require('./utils');
+  const { getConstructorInstructions } = require('../globals/globals');
+}
+
 var blocks = new Map()
 var labelTypes = new Map()
 var sonatinaVariableCounter = 0
@@ -639,4 +645,19 @@ function compileBlock(instructions, currentBlock, /* optional */ parrentBlock) {
   }
   lastCurrentBlock = currentBlock
   return compiledSonatinaInstructions
+}
+
+if (typeof window == 'undefined') {
+  module.exports = {
+    solidityTypeToSonatinaType,
+    labelToValue,
+    rValueToString,
+    createMainFunction,
+    createConstructor,
+    compileToSonatina,
+    compileBlock,
+    initSonatinaFunction,
+    nextValue,
+    nextBlock
+  };
 }

@@ -21,3 +21,11 @@ function freeMemory()
 {
     // TODO: implement this
 }
+
+if (typeof window == 'undefined') {
+  module.exports = {
+      initMemory,
+      allocateMemory,
+      freeMemory
+  };
+}

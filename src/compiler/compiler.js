@@ -1,10 +1,30 @@
+if (typeof window == 'undefined') {
+  const { initMemory } = require('../evm/memory.js');
+  const { parseNumber, parseConstructor } = require('./parser.js');
+  const { toEmoji, getEmojiDescription, loadEmojiLib } = require('../emoji/emoji.js');
+  const {
+    resetStateVariables,
+    resetLocalVariables,
+    resetConstructorInstructions,
+    getCurrentToken,
+    getTokensLength,
+    getToken,
+    advanceToken,
+    resetCurrentToken,
+    getCurrentJumpDestination,
+    addvanceCurrentJumpDestination,
+    setTokens,
+    resetFunctions,
+    getFunctionsLength,
+  } = require('./globals.js')
+}
+
 const MAYOR_VERSION = 1
 const MINOR_VERSION = 0
 
 resetStateVariables()
 resetLocalVariables()
 resetConstructorInstructions()
-var revertDestination
 
 function nextToken()
 {
@@ -62,7 +82,7 @@ function compileToEVMBytecode(unicodeCodePoints) {
   nextJumpDestination()
   let loadFunctionSignaturesDestination = getCurrentJumpDestination()
   nextJumpDestination()
-  revertDestination = getCurrentJumpDestination()
+  setRevertDestination(getCurrentJumpDestination())
   nextJumpDestination()
 
   addPushJump(functionSignaturesDestination)
@@ -95,7 +115,7 @@ function compileToEVMBytecode(unicodeCodePoints) {
   addOpcode("POP")
   addOpcode("SWAP1")
   addOpcode("JUMP")
-  addJumpDestination(revertDestination)
+  addJumpDestination(getRevertDestination())
   addPush("00")
   addPush("00")
   addOpcode("REVERT")
@@ -250,4 +270,8 @@ const deploy = async (abi, bytecode) => {
   });
 
   document.getElementById("_contractAddress").value = deployedContract.options.address
+}
+
+if (typeof window == 'undefined') {
+  module.exports = { compile };
 }

@@ -1,3 +1,7 @@
+if (typeof window == 'undefined') {
+  const { keccak256 } = require('../lib/js-sha3@0.8.0_build_sha3.min.js');
+}
+
 function erc20NameConversor(functionName)
 {
     if(functionName == "coinMoneyBag")
@@ -93,4 +97,15 @@ function convertToFunctionName(name) {
     name = name.replace(/-/g, '');
     name = name.charAt(0).toLowerCase() + name.slice(1);
     return name
+}
+
+if (typeof window == 'undefined') {
+  module.exports = {
+    erc20NameConversor,
+    erc721NameConversor,
+    functionNameConversor,
+    getFunctionSignature,
+    convertToFunctionName,
+    getSelector
+  };
 }

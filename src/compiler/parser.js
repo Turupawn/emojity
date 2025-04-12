@@ -1,3 +1,9 @@
+if (typeof window == 'undefined') {
+  const { getCurrentToken, advanceToken, regressToken } = require('../globals/globals');
+  const { getEmojiDescription } = require('../emoji/emoji');
+  const { functionNameConversor } = require('./utils');
+}
+
 function parseNumber()
 {
     if(getCurrentToken() >= getTokensLength())
@@ -519,4 +525,17 @@ function parseConstructor() {
         return
     }
     nextToken()
+}
+
+if (typeof window == 'undefined') {
+  module.exports = {
+    parseNumber,
+    parseUint,
+    parseParameter,
+    parseInstructions,
+    parseFunction,
+    parseVariable,
+    parseStateVariable,
+    parseConstructor
+  };
 }

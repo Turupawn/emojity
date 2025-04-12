@@ -1,3 +1,8 @@
+if (typeof window == 'undefined') {
+  const Web3 = require('web3');
+  const { keccak256 } = require('../lib/js-sha3@0.8.0_build_sha3.min.js');
+  const { irCodeToBytecode } = require('../compiler/irCode');
+}
 var accounts
 var web3
 const getWeb3 = async () => {
@@ -285,7 +290,7 @@ function convertInstructionToBytecode(instructionsParam) {
       // Revert if subcontext reverted
       addPush("00")
       addOpcode("EQ")
-      addPushJump(revertDestination)
+      addPushJump(getRevertDestination())
       addOpcode("JUMPI")
 
       if(instructionsParam[i].returnValueStorage)
@@ -297,8 +302,24 @@ function convertInstructionToBytecode(instructionsParam) {
       }
     } else if(instructionsParam[i].name == "revert")
     {
-      addPushJump(revertDestination)
+      addPushJump(getRevertDestination())
       addOpcode("JUMPI")
     }
   }
+}
+
+if (typeof window == 'undefined') {
+  module.exports = {
+      getWeb3,
+      loadWeb3,
+      connectWallet,
+      getSelector,
+      contractHeader,
+      intToHex,
+      modifyChar,
+      selectorLookupIr,
+      functionLogic,
+      utilityPushValue,
+      convertInstructionToBytecode
+  };
 }

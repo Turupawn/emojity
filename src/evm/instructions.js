@@ -1,3 +1,9 @@
+if (typeof window == 'undefined') {
+  const { getSelector } = require('./evm');
+  const { allocateMemory } = require('./memory');
+  const { getLocalVariable, hasLocalVariable } = require('../globals/globals');
+}
+
 function push(value) {
   if(value.length == 2)
     return opcodeMap.get("PUSH1") + value
@@ -472,7 +478,7 @@ function operation(lValue, rlValue, operator, rrValue) // lValue = rlValue [Oper
     addOpcode("DUP1") // Uint underflow prevention
     addOpcode("DUP3")
     addOpcode("GT")
-    addPushJump(revertDestination)
+    addPushJump(getRevertDestination())
     addOpcode("JUMPI")
     addOpcode("SUB")
   } else if(operator == '✖️')
@@ -576,4 +582,24 @@ function whileLoop(condition, instructionsParam) {
   addPushJump(startOfWhileDestination)
   addOpcode("JUMP")
   addJumpDestination(endOfWhileDestination)
+}
+
+if (typeof window == 'undefined') {
+  module.exports = {
+      push,
+      codeCopy,
+      rReturn,
+      returnLiteral,
+      returnStringLiteral,
+      rkeccak256,
+      putLabelOnStack,
+      putValueOnStack,
+      putValueOnState,
+      operation,
+      assignment,
+      literalAssignment,
+      logEvent,
+      ifStatement,
+      whileLoop
+  };
 }

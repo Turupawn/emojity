@@ -75,3 +75,14 @@ function irCodeToBytecode() {
 
     return bytecode
 }
+
+if (typeof window == 'undefined') {
+  module.exports = {
+    addPushJump,
+    addOpcode,
+    addJumpDestination,
+    addBytecode,
+    addPush,
+    irCodeToBytecode
+  };
+}

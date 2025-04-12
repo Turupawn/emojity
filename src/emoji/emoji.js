@@ -1,3 +1,7 @@
+if (typeof window == 'undefined') {
+  const EmojiMart = require('emoji-mart');
+  const twemoji = require('twemoji');
+}
 const EMOJI_CSV_PATH = "./csv/emojis.csv"
 const OPCODE_CSV_PATH = "./csv/opcodes.csv"
 
@@ -115,4 +119,13 @@ function parseCSVData(csvData) {
 
 function getEmojiDescription(emojiCode) {
   return (emojiMap.get(emojiCode) || 'Unknown Emoji').replace(/-/g, "_");
+}
+
+if (typeof window == 'undefined') {
+  module.exports = {
+      loadEmojiLib,
+      getEmojiDescription,
+      toEmoji,
+      onEmojiClicked
+  };
 }

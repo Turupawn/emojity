@@ -5,6 +5,7 @@ var _functions
 var _stateVariables
 var _localVariables
 var _constructorInstructions
+var _revertDestination
 
 function getCurrentToken() {
     return _currentToken;
@@ -111,4 +112,46 @@ function getConstructorInstructions() {
 
 function setConstructorInstructions(instructions) {
     _constructorInstructions = instructions;
+}
+
+function getRevertDestination() {
+    return _revertDestination;
+}
+
+function setRevertDestination(destination) {
+    _revertDestination = destination;
+}
+
+if (typeof window == 'undefined') {
+    module.exports = {
+        getCurrentToken,
+        advanceToken,
+        regressToken,
+        resetCurrentToken,
+        getCurrentJumpDestination,
+        addvanceCurrentJumpDestination,
+        resetCurrentJumpDestination,
+        setTokens,
+        getTokensLength,
+        getToken,
+        resetFunctions,
+        getFunctionsLength,
+        getFunction,
+        addFunction,
+        resetStateVariables,
+        getStateVariable,
+        hasStateVariable,
+        addStateVariable,
+        getStateVariablesSize,
+        getStateVariablesEntries,
+        resetLocalVariables,
+        setLocalVariables,
+        getLocalVariable,
+        hasLocalVariable,
+        resetConstructorInstructions,
+        getConstructorInstructions,
+        setConstructorInstructions,
+        getRevertDestination,
+        setRevertDestination
+    };
 }
