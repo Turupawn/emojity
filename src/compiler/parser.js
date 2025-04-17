@@ -1,4 +1,4 @@
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
     const {
         getCurrentToken,
         advanceToken,
@@ -540,7 +540,7 @@ function parseConstructor() {
     nextToken()
 }
 
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
     module.exports = {
         parseNumber,
         parseUint,

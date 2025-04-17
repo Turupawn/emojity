@@ -1,4 +1,4 @@
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
   const { initMemory } = require('../evm/memory.js');
   const { parseNumber, parseConstructor, parseStateVariable, parseFunction } = require('./parser.js');
   const { toEmoji, getEmojiDescription, loadEmojiLib } = require('../emoji/emoji.js');
@@ -675,7 +675,7 @@ function compileBlock(instructions, currentBlock, /* optional */ parrentBlock) {
   return compiledSonatinaInstructions
 }
 
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
   module.exports = {
     solidityTypeToSonatinaType,
     labelToValue,

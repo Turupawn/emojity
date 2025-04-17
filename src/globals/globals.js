@@ -7,6 +7,10 @@ var _localVariables
 var _constructorInstructions
 var _revertDestination
 
+function isTypeScript() {
+    return false;
+}
+
 function getCurrentToken() {
     return _currentToken;
 }
@@ -122,8 +126,9 @@ function setRevertDestination(destination) {
     _revertDestination = destination;
 }
 
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
     module.exports = {
+        isTypeScript,
         getCurrentToken,
         advanceToken,
         regressToken,

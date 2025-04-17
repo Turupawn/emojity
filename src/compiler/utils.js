@@ -1,4 +1,4 @@
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
     const { keccak256 } = require('../lib/js-sha3@0.8.0_build_sha3.min.js');
 }
 
@@ -99,7 +99,7 @@ function convertToFunctionName(name) {
     return name
 }
 
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
     module.exports = {
         erc20NameConversor,
         erc721NameConversor,

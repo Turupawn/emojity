@@ -1,4 +1,4 @@
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
     const { selectorLookupIr, functionLogic, intToHex } = require('../evm/evm.js');
     const { push } = require('../evm/instructions.js');
 }
@@ -79,7 +79,7 @@ function irCodeToBytecode() {
     return bytecode
 }
 
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
     module.exports = {
         addPushJump,
         addOpcode,

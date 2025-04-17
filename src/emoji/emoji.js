@@ -1,4 +1,4 @@
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
   const EmojiMart = require('emoji-mart');
   const twemoji = require('twemoji');
 }
@@ -121,6 +121,6 @@ function getEmojiDescription(emojiCode) {
   return (emojiMap.get(emojiCode) || 'Unknown Emoji').replace(/-/g, "_");
 }
 
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
   //export { loadEmojiLib, getEmojiDescription, toEmoji, onEmojiClicked };
 }

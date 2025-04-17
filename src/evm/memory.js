@@ -22,7 +22,7 @@ function freeMemory()
     // TODO: implement this
 }
 
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
   module.exports = {
     initMemory,
     allocateMemory,

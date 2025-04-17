@@ -1,4 +1,4 @@
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
   const { getSelector } = require('./evm');
   const { allocateMemory } = require('./memory');
   const { getLocalVariable, hasLocalVariable, hasStateVariable, getStateVariable } = require('../globals/globals');
@@ -586,7 +586,7 @@ function whileLoop(condition, instructionsParam) {
   addJumpDestination(endOfWhileDestination)
 }
 
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
   module.exports = {
     push,
     codeCopy,

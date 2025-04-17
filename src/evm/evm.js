@@ -1,4 +1,4 @@
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
   const Web3 = require('web3');
   const { keccak256 } = require('../lib/js-sha3@0.8.0_build_sha3.min.js');
   const { addPushJump, addOpcode, addJumpDestination, irCodeToBytecode, addPush, addBytecode } = require('../compiler/irCode');
@@ -351,7 +351,7 @@ function convertInstructionToBytecode(instructionsParam) {
   }
 }
 
-if (typeof window == 'undefined') {
+if (isTypeScript()) {
   module.exports = {
       getWeb3,
       loadWeb3,

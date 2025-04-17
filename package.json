@@ -2,7 +2,7 @@
     "name": "emojity-compiler",
     "version": "1.0.4",
     "description": "Compiler for Emojity smart contracts",
-    "main": "src/emojity.js",
+    "main": "src/emojityTypeScripLoad.js",
     "types": "src/emojity.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
