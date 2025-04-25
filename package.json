@@ -1,6 +1,6 @@
 {
     "name": "emojity-compiler",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Compiler for Emojity smart contracts",
     "main": "src/emojityTypeScripLoad.js",
     "types": "src/emojity.d.ts",
